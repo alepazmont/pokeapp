@@ -10,8 +10,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Por debajo de la cabecera (50) para no desteñirla. */
-    z-index: 40;
+    /* Por encima de todo, cabecera incluida, mientras está visible. */
+    z-index: 9999999;
 }
 
 h2 {
@@ -40,7 +40,7 @@ div#combat-loader-screen {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 40;
+    z-index: 9999999;
 }
 
 div#combat-loader {
