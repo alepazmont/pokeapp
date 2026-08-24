@@ -55,8 +55,71 @@ div#search {
     transition: transform 0.3s ease;
 }
 
+.card-slot {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+}
+
+.card-role {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #ffe100;
+    text-shadow: 0 0 2px #040459, 0 0 5px #040459, 0 0 7px #040459;
+    margin: 8px 10px 0;
+}
+
+.card-slot--winner .card-role {
+    color: #3fcd3f;
+}
+
+.card-slot--loser .card-role {
+    color: #c9c9c9;
+}
+
+.card--winner {
+    animation: card-bounce 2.4s ease-in-out infinite;
+    transform-origin: center center;
+    will-change: transform;
+}
+
+.card--loser {
+    filter: brightness(0.45) saturate(0.55);
+    opacity: 0.78;
+    box-shadow: 4px 4px 10px #00000066;
+}
+
+.card--loser:hover {
+    transform: none;
+    filter: brightness(0.5) saturate(0.6);
+}
+
+@keyframes card-bounce {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card--winner {
+        animation: none;
+    }
+}
+
 .card:hover {
     transform: rotate(-4deg) scale(1.3);
+    z-index: 9999;
+}
+
+.card--winner:hover {
+    animation: card-bounce 2.4s ease-in-out infinite;
+    transform: unset;
     z-index: 9999;
 }
 
@@ -218,6 +281,15 @@ img.iconType {
         z-index: 9999;
     }
 
+    .card--winner:hover {
+        animation: card-bounce 2.4s ease-in-out infinite;
+        transform: unset;
+    }
+
+    .card--loser:hover {
+        transform: none;
+    }
+
     .cardInfo td {
         width: 50px;
     }
@@ -376,7 +448,7 @@ img.iconType {
 
 #result {
     text-align: center;
-    line-height: 0.4;
+    line-height: 1.2;
     margin-top: 40px;
     font-size: 40px;
     z-index: 99999;
@@ -384,6 +456,56 @@ img.iconType {
     text-shadow: 0px 0px 2px #040459, 0px 0px 5px #040459, 0px 0px 7px #040459;
     position: relative;
     margin-bottom: 70px;
+}
+
+.combat-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin: 12px 0 6px;
+}
+
+.combat-role-label {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    opacity: 0.95;
+}
+
+.combat-poke-name {
+    font-size: 45px;
+    line-height: 1.1;
+}
+
+.combat-name--ganador .combat-role-label {
+    color: #9dff9d;
+}
+
+.combat-name--ganador .combat-poke-name {
+    color: #3fcd3f;
+    animation: card-bounce 2.4s ease-in-out infinite;
+    display: inline-block;
+}
+
+.combat-name--perdedor {
+    margin-top: 28px;
+    filter: brightness(0.72);
+}
+
+.combat-name--perdedor .combat-role-label {
+    color: #bbb;
+}
+
+.combat-name--perdedor .combat-poke-name {
+    color: #b84a4a;
+}
+
+.combat-name--empate .combat-poke-name {
+    font-size: 32px;
+    color: #ffe100;
 }
 
 .ganador {

@@ -57,11 +57,26 @@ const getPokemon = async () => {
   }
 };
 
-const drawCards = (pokemon) => {
+const drawCards = (pokemon, combatMeta = null) => {
   main$$.innerHTML = "";
-  for (const poke of pokemon) {
-    let characterDiv$$ = document.createElement("div");
+  pokemon.forEach((poke, index) => {
+    const meta = combatMeta?.[index] ?? null;
+    const wrap$$ = document.createElement("div");
+    wrap$$.className = "card-slot";
+    if (meta?.outcome === "winner") wrap$$.classList.add("card-slot--winner");
+    if (meta?.outcome === "loser") wrap$$.classList.add("card-slot--loser");
+
+    if (meta?.role) {
+      const role$$ = document.createElement("div");
+      role$$.className = "card-role";
+      role$$.textContent = meta.role;
+      wrap$$.appendChild(role$$);
+    }
+
+    const characterDiv$$ = document.createElement("div");
     characterDiv$$.className = "card " + poke.mainType;
+    if (meta?.outcome === "winner") characterDiv$$.classList.add("card--winner");
+    if (meta?.outcome === "loser") characterDiv$$.classList.add("card--loser");
     characterDiv$$.innerHTML = `
     <h3>#${poke.id} ${poke.name} <img class="iconType ${poke.mainType}" src="img/icons/${poke.mainType}.svg" alt="Tipo ${poke.mainType}"></h3>
     <p class="exp">Exp. Inicial ${poke.exp}</p>
@@ -93,9 +108,28 @@ const drawCards = (pokemon) => {
     characterDiv$$.addEventListener("click", () => {
       playPokemonSound(poke.sound);
     });
-    main$$.appendChild(characterDiv$$);
-  }
+    wrap$$.appendChild(characterDiv$$);
+    main$$.appendChild(wrap$$);
+  });
 };
+
+const drawCombatCards = (local, visitante, winner) => {
+  const outcomeFor = (poke) => {
+    if (!winner) return null;
+    return poke.id === winner.id ? "winner" : "loser";
+  };
+  drawCards([local, visitante], [
+    { role: "Local", outcome: outcomeFor(local) },
+    { role: "Visitante", outcome: outcomeFor(visitante) },
+  ]);
+};
+
+const combatNameBlock = (role, name, kind) => `
+  <div class="combat-name combat-name--${kind}">
+    <span class="combat-role-label">${role}</span>
+    <span class="combat-poke-name">${name}</span>
+  </div>
+`;
 
 const drawInput = () => {
   const input$$ = document.querySelector("#search input[type='text']");
@@ -368,40 +402,37 @@ async function combat() {
   const def1 = { defensa: defensa1, defensaEspecial: defensaEspecial1 };
   const def2 = { defensa: defensa2, defensaEspecial: defensaEspecial2 };
 
-  let winner;
-  let looser;
+  const roleOf = (poke) => (poke.id === pokemon1.id ? "Local" : "Visitante");
 
   if (power1 > power2) {
-    winner = pokemon1;
-    looser = pokemon2;
     result$$.innerHTML = `
-      <div class="ganador">${pokemon1.name}</div><br>
+      ${combatNameBlock(roleOf(pokemon1), pokemon1.name, "ganador")}
       ${buildEquation(stats1, def2, "verde", power1)}
       <br>
       <div class="gana">gana el combate a</div><br>
-      <div class="perdedor">${pokemon2.name}</div><br>
+      ${combatNameBlock(roleOf(pokemon2), pokemon2.name, "perdedor")}
       ${buildEquation(stats2, def1, "rojo", power2)}
     `;
-    main$$.innerHTML = "";
-    drawCards([winner, looser]);
+    drawCombatCards(pokemon1, pokemon2, pokemon1);
     console.log(pokemon1.name, power1, "-", pokemon2.name, power2);
   } else if (power1 < power2) {
-    winner = pokemon2;
-    looser = pokemon1;
     result$$.innerHTML = `
-      <div class="ganador">${pokemon2.name}</div><br>
+      ${combatNameBlock(roleOf(pokemon2), pokemon2.name, "ganador")}
       ${buildEquation(stats2, def1, "verde", power2)}
       <br>
       <div class="gana">gana el combate a</div><br>
-      <div class="perdedor">${pokemon1.name}</div><br>
+      ${combatNameBlock(roleOf(pokemon1), pokemon1.name, "perdedor")}
       ${buildEquation(stats1, def2, "rojo", power1)}
     `;
-    main$$.innerHTML = "";
-    drawCards([winner, looser]);
+    drawCombatCards(pokemon1, pokemon2, pokemon2);
     console.log(pokemon2.name, power2, "-", pokemon1.name, power1);
   } else {
-    result$$.innerHTML = `<div class="gana">¡Empate! (${power1} = ${power2})</div>`;
-    drawCards([pokemon1, pokemon2]);
+    result$$.innerHTML = `
+      <div class="gana">¡Empate! (${power1} = ${power2})</div>
+      ${combatNameBlock("Local", pokemon1.name, "empate")}
+      ${combatNameBlock("Visitante", pokemon2.name, "empate")}
+    `;
+    drawCombatCards(pokemon1, pokemon2, null);
     console.log(`Empatan ${power1} = ${power2}`);
   }
 }
