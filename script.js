@@ -65,6 +65,7 @@ const getPokemon = async () => {
 
 const drawCards = (pokemon, combatMeta = null) => {
   main$$.innerHTML = "";
+  main$$.classList.toggle("main--duelo", Boolean(combatMeta));
   pokemon.forEach((poke, index) => {
     const meta = combatMeta?.[index] ?? null;
     const wrap$$ = document.createElement("div");
