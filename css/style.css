@@ -76,7 +76,7 @@ div#search {
 }
 
 .card-slot--loser .card-role {
-    color: #c9c9c9;
+    color: var(--combat-red);
 }
 
 .card--winner {
@@ -446,6 +446,16 @@ img.iconType {
 
 /* BATALLA POKÉMON */
 
+:root {
+    --combat-red: #ff2424;
+    --combat-red-shadow:
+        0 0 2px #fff,
+        0 0 3px #fff,
+        0 0 2px #2a0000,
+        0 0 5px #040459,
+        0 0 7px #040459;
+}
+
 #result {
     text-align: center;
     line-height: 1.2;
@@ -492,15 +502,17 @@ img.iconType {
 
 .combat-name--perdedor {
     margin-top: 28px;
-    filter: brightness(0.72);
 }
 
-.combat-name--perdedor .combat-role-label {
-    color: #bbb;
+.combat-name--perdedor .combat-role-label,
+.combat-name--perdedor .combat-poke-name,
+.perdedor {
+    color: var(--combat-red);
+    text-shadow: var(--combat-red-shadow);
 }
 
 .combat-name--perdedor .combat-poke-name {
-    color: #b84a4a;
+    font-size: 45px;
 }
 
 .combat-name--empate .combat-poke-name {
@@ -522,7 +534,6 @@ img.iconType {
 }
 
 .perdedor {
-    color: #ff2f2f;
     font-size: 45px;
     margin-top: 25px;
 }
@@ -534,7 +545,7 @@ img.iconType {
     line-height: 1.55;
 }
 .ecuacion .verde, .ecuacion .rojo {
-    text-shadow: 0 0 3px #fff;
+    text-shadow: 0 0 3px #fff, 0 0 2px #fff;
 }
 .ecuacion .attr-label {
     font-size: 0.72em;
@@ -550,7 +561,7 @@ img.iconType {
 }
 
 .rojo {
-    color: #8a1919;
+    color: var(--combat-red);
 }
 
 .infoClick {
