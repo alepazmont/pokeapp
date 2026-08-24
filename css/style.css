@@ -518,6 +518,7 @@ img.iconType {
     z-index: 99999;
     color: #ffe100;
     text-shadow: 0px 0px 2px #040459, 0px 0px 5px #040459, 0px 0px 7px #040459;
+    margin-top: 30px;
 }
 
 .perdedor {

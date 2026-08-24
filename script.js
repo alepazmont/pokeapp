@@ -408,8 +408,7 @@ async function combat() {
     result$$.innerHTML = `
       ${combatNameBlock(roleOf(pokemon1), pokemon1.name, "ganador")}
       ${buildEquation(stats1, def2, "verde", power1)}
-      <br>
-      <div class="gana">gana el combate a</div><br>
+      <div class="gana">gana el combate a</div>
       ${combatNameBlock(roleOf(pokemon2), pokemon2.name, "perdedor")}
       ${buildEquation(stats2, def1, "rojo", power2)}
     `;
@@ -419,8 +418,7 @@ async function combat() {
     result$$.innerHTML = `
       ${combatNameBlock(roleOf(pokemon2), pokemon2.name, "ganador")}
       ${buildEquation(stats2, def1, "verde", power2)}
-      <br>
-      <div class="gana">gana el combate a</div><br>
+      <div class="gana">gana el combate a</div>
       ${combatNameBlock(roleOf(pokemon1), pokemon1.name, "perdedor")}
       ${buildEquation(stats1, def2, "rojo", power1)}
     `;
