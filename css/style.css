@@ -1,0 +1,426 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    color: #000;
+    background-image: url(../img/background_prairie_pokemon.jpg);
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+header {
+    color: #ffe100;
+}
+
+.filters {
+    display: flex;
+    flex-direction: row;
+}
+
+.header-bar {
+    background-color: #0c0c92;
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    position: fixed;
+    width: 100%;
+    z-index: 99999;
+    margin-top: -120px;
+    justify-content: center;
+}
+
+header div img {
+    width: 120px;
+}
+
+div#selector,
+div#search {
+    margin-left: 30px;
+}
+
+.main {
+    margin-top: -25px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.card {
+    border: 6px solid #ffe100;
+    border-radius: 19px;
+    padding: 20px;
+    margin: 10px;
+    box-shadow: 10px 10px 15px #00000099;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: rotate(-4deg) scale(1.3);
+    z-index: 9999;
+}
+
+
+img.pokeImg {
+    position: relative;
+    height: 160px;
+    width: 180px;
+    margin: 0px;
+    padding: 18px;
+
+}
+.imgBack {
+    position: relative; 
+    width: 100%;
+}
+
+.imgBack::before {
+    content: "";
+    background-image: url(../img/background_prairie_pokemon.jpg);
+    background-size: cover;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    opacity: 0.75;
+}
+
+p.exp {
+    position: absolute;
+    font-size: 10px;
+    margin-top: 3px;
+    margin-left: 143px;
+    font-style: italic;
+    z-index: 99;
+    text-shadow: 0 0 2px white, 0 0 2px white, 0 0 2px white, 0 0 10px white;
+}
+
+.container {
+    margin-left: 60px;
+}
+
+p {
+    margin-bottom: 20px;
+}
+
+p.type {
+    margin: 0;
+}
+
+p.abilities {
+    height: 50px;
+}
+
+h3 {
+    margin: 0px 0px 10px 0px;
+}
+
+.desktopHide {
+    display: none;
+}
+
+.card-title {
+    text-transform: uppercase;
+    font-size: 32px;
+    font-weight: normal;
+    margin-bottom: 0;
+}
+
+.cardInfo {
+    margin-top: 10px;
+    background-color: khaki;
+    padding: 10px;
+    font-size: 12px;
+}
+
+.cardInfo td {
+    width: 95px;
+}
+
+.cardInfo p {
+    margin: 0px;
+}
+
+img.iconType {
+    margin-top: -5px;
+    width: 17px;
+    float: right;
+    padding: 7px;
+    border-radius: 100%;
+    box-shadow: inset 0.2em 0.2em 0.2em 0 rgba(255, 255, 255, 0.5), inset -0.2em -0.2em 0.2em 0 rgba(0, 0, 0, 0.5);
+}
+
+.card-subtitle {
+    font-weight: lighter;
+    color: #666;
+    margin-top: 5px;
+}
+
+.card-image {
+    height: 180px;
+}
+
+#pokedex {
+    padding-inline-start: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-gap: 20px;
+}
+
+@media (max-width: 863px) {
+
+    .main {
+        margin-top: 10px;
+    }
+
+    .filters {
+        flex-direction: row;
+    }
+
+    select {
+        font-size: 12px;
+    }
+
+    input {
+        font-size: 10px;
+    }
+
+    .header-bar {
+        flex-direction: column;
+        text-align: center;
+        position: initial;
+        margin-top: 0px;
+        font-size: 10px;
+    }
+
+    div#selector,
+    div#search,
+    .container {
+        margin-left: 0px;
+        margin-top: 10px;
+    }
+
+    .container {
+        margin-bottom: 20px;
+    }
+
+    .card {
+        border: 4px solid #ffe100;
+        border-radius: 11px;
+        padding: 11px;
+        margin: 6px;
+        box-shadow: 5px 5px 8px #00000099;
+    }
+
+    .card:hover {
+        transform: rotate(-2deg) scale(1.1);
+        z-index: 9999;
+    }
+
+    .cardInfo td {
+        width: 50px;
+    }
+
+    .cardInfo {
+        margin-top: 5px;
+        background-color: khaki;
+        padding: 3px;
+        font-size: 6px;
+        width: 102px;
+    }
+
+    p.exp {
+        font-size: 6px;
+        margin-top: 1px;
+        margin-left: 65px;
+    }
+
+    h3 {
+        margin: 0px 0px 5px 0px;
+        font-size: 11px;
+    }
+
+    img.pokeImg {
+        height: 80px;
+        width: 90px;
+        background-color: aquamarine;
+        margin: 0px;
+        padding: 9px;
+    }
+
+    img.iconType {
+        margin-top: -8px;
+        width: 9px;
+        float: right;
+        padding: 4px;
+        border-radius: 100%;
+        box-shadow: inset 0.1em 0.1em 0.1em 0 rgba(255, 255, 255, 0.5), inset -0.1em -0.1em 0.1em 0 rgba(0, 0, 0, 0.5);
+    }
+
+    .mobileHide {
+        display: none;
+    }
+
+    .desktopHide {
+        display: initial;
+    }
+
+    div#pokemon-selectors {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+/* FONDOS PARA CADA TIPO  */
+
+.Normal {
+    background: linear-gradient(180deg, #A8A77A 50%, #6D6D4E 100%);
+}
+.Fire {
+    background: linear-gradient(180deg, #EE8130 50%, #9C531F 100%);
+}
+.Water {
+    background: linear-gradient(180deg, #6390F0 50%, #2B65A6 100%);
+}
+.Electric {
+    background: linear-gradient(180deg, #F7D02C 50%, #A1871F 100%);
+}
+.Grass {
+    background: linear-gradient(180deg, #7AC74C 50%, #4E8234 100%);
+}
+.Ice {
+    background: linear-gradient(180deg, #96D9D6 50%, #638D8D 100%);
+}
+.Fighting {
+    background: linear-gradient(180deg, #C22E28 50%, #7D1F1A 100%);
+}
+.Poison {
+    background: linear-gradient(180deg, #A33EA1 50%, #682A68 100%);
+}
+.Ground {
+    background: linear-gradient(180deg, #E2BF65 50%, #927D44 100%);
+}
+.Flying {
+    background: linear-gradient(180deg, #A98FF3 50%, #6D5E9C 100%);
+}
+.Psychic {
+    background: linear-gradient(180deg, #F95587 50%, #A13959 100%);
+}
+.Bug {
+    background: linear-gradient(180deg, #A6B91A 50%, #6D7815 100%);
+}
+.Rock {
+    background: linear-gradient(180deg, #b9b9b9 50%, #8b8b8b 100%);
+}
+.Ghost {
+    background: linear-gradient(180deg, #735797 50%, #493963 100%);
+}
+.Dragon {
+    background: linear-gradient(180deg, #6F35FC 50%, #3F1B94 100%);
+}
+.Steel {
+    background: linear-gradient(180deg, #B7B7CE 50%, #787887 100%);
+}
+.Fairy {
+    background: linear-gradient(180deg, #D685AD 50%, #9B6470 100%);
+}
+
+.card.Normal .imgBack::before {
+    background-image: url(../img/bg/normal-bg.png);
+}
+.card.Grass .imgBack::before {
+    background-image: url(../img/bg/grass-bg.jpg);
+}
+.card.Fire .imgBack::before {
+    background-image: url(../img/bg/fire-bg.jpg);
+}
+.card.Water .imgBack::before {
+    background-image: url(../img/bg/water-bg.jpeg);
+}
+.card.Bug .imgBack::before {
+    background-image: url(../img/bg/bug-bg.png);
+}
+.card.Poison .imgBack::before {
+    background-image: url(../img/bg/poison-bg.jpg);
+}
+.card.Electric .imgBack::before {
+    background-image: url(../img/bg/electric-bg.webp);
+}
+.card.Ground .imgBack::before {
+    background-image: url(../img/bg/ground-bg.jpg);
+}
+.card.Fighting .imgBack::before {
+    background-image: url(../img/bg/fight-bg.webp);
+}
+.card.Psychic .imgBack::before {
+    background-image: url(../img/bg/psychic-bg.jpg);
+}
+.card.Rock .imgBack::before {
+    background-image: url(../img/bg/rock-bg.jpg);
+}
+.card.Ghost .imgBack::before {
+    background-image: url(../img/bg/ghost-bg.jpg);
+}
+.card.Fairy .imgBack::before {
+    background-image: url(../img/bg/fairy-bg.avif);
+}
+.card.Ice .imgBack::before {
+    background-image: url(../img/bg/ice-bg.avif);
+}
+.card.Dragon .imgBack::before {
+    background-image: url(../img/bg/dragon-bg.avif);
+}
+
+/* BATALLA POKÉMON */
+
+#result {
+    text-align: center;
+    line-height: 0.4;
+    margin-top: 40px;
+    font-size: 40px;
+    z-index: 99999;
+    color: #ffe100;
+    text-shadow: 0px 0px 2px #040459, 0px 0px 5px #040459, 0px 0px 7px #040459;
+    position: relative;
+    margin-bottom: 70px;
+}
+
+.ganador {
+    color: #3fcd3f;
+    font-size: 45px;
+}
+
+.gana {
+    font-size: 30px;
+    z-index: 99999;
+    color: #ffe100;
+    text-shadow: 0px 0px 2px #040459, 0px 0px 5px #040459, 0px 0px 7px #040459;
+}
+
+.perdedor {
+    color: #ff2f2f;
+    font-size: 45px;
+    margin-top: 25px;
+}
+
+.ecuacion {
+    font-size: 25px;
+    color: #000;
+    text-shadow: none;
+}
+.ecuacion .verde, .ecuacion .rojo {
+    text-shadow: 0 0 3px #fff;
+}
+.verde {
+    color: #227922;
+}
+
+.rojo {
+    color: #8a1919;
+}
+
+.infoClick {
+    margin: 120px 0 30px;
+    text-align: center;
+}

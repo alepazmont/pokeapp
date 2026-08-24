@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MiniPokedex: Pokédex de Kanto con sistema de combates, efectividad de tipos y ecuación de poder casera.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/loaders.css">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <script defer src="script.js"></script>
+    <title>MiniPokedex · pokeapp</title>
+</head>
+
+
+
+<body>
+    <header>
+        <div class="header-bar">
+            <img id="logo" src="img/cards-game-logo.png" alt="Logo Pokemon Trading Cards">
+            <div class="filters">
+                <div id="selector">
+                    <fieldset>
+                        <legend>Filtrar por:</legend>
+                        <select name="pokemonType" id="pokemonTypeSelect">
+                            <option value="default">Todos los tipos</option>
+                            <option value="normal">Normal</option>
+                            <option value="fire">Fuego</option>
+                            <option value="water">Agua</option>
+                            <option value="electric">Eléctrico</option>
+                            <option value="grass">Planta</option>
+                            <option value="ice">Hielo</option>
+                            <option value="fighting">Lucha</option>
+                            <option value="poison">Veneno</option>
+                            <option value="ground">Tierra</option>
+                            <option value="flying">Volador</option>
+                            <option value="psychic">Psíquico</option>
+                            <option value="bug">Bicho</option>
+                            <option value="rock">Roca</option>
+                            <option value="ghost">Fantasma</option>
+                            <option value="dragon">Dragón</option>
+                            <option value="steel">Acero</option>
+                            <option value="fairy">Hada</option>
+                            <img src="" alt="">
+                        </select>
+                    </fieldset>
+                </div>
+                <div id="search">
+                    <fieldset>
+                        <legend>Buscar por:</legend>
+                        <input type="text" id="searchform" placeholder="Escribe aquí...">
+                    </fieldset>
+                </div>
+            </div>
+            <div class="container">
+                <div id="pokemon-selectors">
+                    <fieldset>
+                        <legend>Combate Pokémon</legend>
+                        <select id="pokemon1">
+                            <option value="">Elige un Pokémon</option>
+                        </select>
+                        contra
+                        <select id="pokemon2">
+                            <option value="">Elige un Pokémon</option>
+                        </select><br class="desktopHide">
+                        <button id="combat-button">Combatir</button>
+                    </fieldset>
+                </div>
+            </div>
+    
+    </header>
+    <div id="combat-loader-screen" style="display: none;">
+        <div id="combat-loader">
+            <h2>Preparando el combate<img class="dotsanimation" src="img/dotsanimation.gif"></h2>
+            <img id="combat-gif" src="img/battle.gif" alt="Loading Combat">
+        </div>
+    </div>
+    <h4 class="infoClick"></h4>
+    <main class="mainContainer">
+        <div class="main">
+            <div id="loader-screen">
+                <div id="loader-info">
+                    <h2>Cargando la Pokedex<img class="dotsanimation" src="img/dotsanimation.gif"></h2>
+                    <img id="loading-gif" src="img/pokeball.gif" alt="Loading Pokeball">
+                </div>
+            </div>
+        </div>
+        <div id="result"></div>
+    </main>
+</body>
+
+</html>
+
