@@ -11,26 +11,24 @@ El enunciado pedía una Pokédex. Yo me embarqué en un **sistema de combates**.
 No bastaba con listar Pokémon: quería que dos bichos se enfrentaran y que el resultado **tuviera pinta de combate de verdad**. Eso implica:
 
 1. **Tabla de efectividad de tipos** completa: 18×18 celdas en clave ofensiva, con ventaja, penalización e inmunidades reales.
-2. Un **motor de turnos**: cada Pokémon ataca por su mejor vía (física o especial), el rival se defiende con la stat que le corresponde, y de ahí sale el daño por turno y los turnos que necesita para noquear.
+2. Una **ecuación de puntuación** casera que mezcla las seis estadísticas del Pokémon contra las defensas del rival, el multiplicador de tipo y un factor aleatorio a modo de suerte.
 3. La cuenta **se muestra en pantalla** con cada valor etiquetado, porque si vas a inventarte un motor, al menos que se vea de dónde sale el número.
 4. Loader teatral de 4 segundos + tema de batalla, para simular que “el cálculo es más complicado de lo que es” (spoiler: el comentario en el código lo confiesa).
 
-En resumen: un ejercicio de API que se convirtió en un motor de duelos con física inventada, UI de cartas y soundtrack. Del “saca los 150 y filtro por tipo” al “¿quién gana Charizard vs Blastoise y en cuántos turnos?”.
+En resumen: un ejercicio de API que se convirtió en un motor de duelos con física inventada, UI de cartas y soundtrack. Del “saca los 150 y filtro por tipo” al “¿quién gana Charizard vs Blastoise y por cuánto?”.
 
 ## Cómo se resuelve un combate
 
 ```
-daño por turno = (mejor ataque / defensa correspondiente del rival) × potencia × tipo × suerte
-turnos         = ceil(HP del rival / daño por turno)
+puntuación = (HP × (Atq + Atq.Esp)) / (Def.rival + Def.Esp.rival) × (Vel / 100) × tipo × suerte
 ```
 
-- **Potencia** es una constante (35) calibrada para que los turnos caigan en un rango legible.
+Gana la **puntuación más alta**. El número no es daño: es una nota que resume lo bien que le va a un Pokémon frente a ese rival concreto.
+
 - **Tipo** sale de la tabla de efectividad: 1.3 con ventaja, 0.7 con penalización, 0 si es inmune.
 - **Suerte** es un factor aleatorio entre 0.85 y 1.15, distinto para cada contendiente.
-- Gana quien **noquea en menos turnos**. A igualdad de turnos gana el más **rápido**, que golpea primero.
-- Si ninguno puede dañar al otro (Gengar contra Snorlax: Fantasma y Normal son inmunes entre sí), decide también la velocidad.
-
-Cada stat entra una sola vez y para lo que sirve: el ataque hiere, la defensa aguanta, el HP mide cuánto tardas en caer y la velocidad decide la iniciativa.
+- Las defensas son las **del rival**: la misma ofensiva puntúa más contra un Pokémon blando.
+- Si ninguno puede puntuar porque sus tipos son inmunes entre sí (Gengar contra Snorlax: Fantasma y Normal no se tocan), ambos quedan a 0 y decide la velocidad.
 
 ## Qué hace
 

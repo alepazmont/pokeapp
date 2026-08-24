@@ -15,9 +15,8 @@ const statValue = (poke, name) => {
   return found ? found.base_stat : 0;
 };
 
-// flex, no block: el velo centra su panel con flexbox y el estilo en línea manda.
 const showLoader = () => {
-  loader$$.style.display = "flex";
+  loader$$.style.display = "block";
 };
 
 const hideLoader = () => {
@@ -264,9 +263,6 @@ const effectiveness = {
   fairy: { normal: 1, fighting: ventaja, flying: 1, poison: penalizacion, ground: 1, rock: 1, bug: 1, ghost: 1, steel: penalizacion, fire: penalizacion, water: 1, grass: 1, electric: 1, psychic: 1, ice: 1, dragon: ventaja, dark: ventaja, fairy: 1 },
 };
 
-// Potencia media de un movimiento. Calibra los turnos para noquear a un rango legible (1-8).
-const POTENCIA_BASE = 35;
-
 const round4 = (n) => Number(n.toFixed(4));
 
 const getEffectiveness = (tipoAtacante, tipoDefensor) => {
@@ -286,30 +282,33 @@ const effectivenessLabel = (valor) => {
   return "neutral";
 };
 
-/* Cada Pokémon ataca por su mejor vía (física o especial) y el rival se defiende con la
-stat que le corresponde. Con el daño por turno sale cuántos turnos necesita para noquear. */
-const buildAttack = (atacante, defensor) => {
-  const atq = statValue(atacante, "attack");
-  const atqEsp = statValue(atacante, "special-attack");
-  const fisico = atq >= atqEsp;
-  const ofensiva = fisico ? atq : atqEsp;
-  const defensaRival = fisico
-    ? statValue(defensor, "defense")
-    : statValue(defensor, "special-defense");
+/* Puntuación de un Pokémon frente a otro: no es daño, es una nota que sale de sus
+seis estadísticas contra las defensas del rival, ajustada por tipo y por suerte. */
+const buildScore = (atacante, defensor) => {
+  const hp = statValue(atacante, "hp");
+  const ataque = statValue(atacante, "attack");
+  const ataqueEspecial = statValue(atacante, "special-attack");
+  const velocidad = statValue(atacante, "speed");
+  const defensaRival = statValue(defensor, "defense");
+  const defensaEspecialRival = statValue(defensor, "special-defense");
   const tipo = getEffectiveness(atacante.mainType, defensor.mainType);
   const suerte = round4(0.85 + Math.random() * 0.3);
-  const hpRival = statValue(defensor, "hp");
-  const golpe = round4((ofensiva / defensaRival) * POTENCIA_BASE * tipo * suerte);
+  const puntuacion = round4(
+    ((hp * (ataque + ataqueEspecial)) / (defensaRival + defensaEspecialRival)) *
+      (velocidad / 100) *
+      tipo *
+      suerte
+  );
   return {
-    fisico,
-    ofensiva,
+    hp,
+    ataque,
+    ataqueEspecial,
+    velocidad,
     defensaRival,
+    defensaEspecialRival,
     tipo,
     suerte,
-    hpRival,
-    golpe,
-    turnos: golpe > 0 ? Math.ceil(hpRival / golpe) : Infinity,
-    velocidad: statValue(atacante, "speed"),
+    puntuacion,
   };
 };
 
@@ -334,7 +333,7 @@ const showCombatLoader = () => {
   }
 
   return new Promise(resolve => {
-    combatLoader$$.style.display = "flex";
+    combatLoader$$.style.display = "block";
     setTimeout(() => {
       resolve();
     }, 4000); // 4000 milisegundos de tiempo de espera
@@ -358,53 +357,61 @@ async function combat() {
   const pokemon1 = original150.find((pokemon) => pokemon.name === pokemon1Name);
   const pokemon2 = original150.find((pokemon) => pokemon.name === pokemon2Name);
 
-  const ataque1 = buildAttack(pokemon1, pokemon2);
-  const ataque2 = buildAttack(pokemon2, pokemon1);
+  const score1 = buildScore(pokemon1, pokemon2);
+  const score2 = buildScore(pokemon2, pokemon1);
 
   const chip = (attr, value, colorClass) =>
     `<span class="formula-chip formula-chip--${colorClass}"><span class="formula-chip__attr">${attr}</span><span class="formula-chip__val">${value}</span></span>`;
 
-  const turnosTexto = (turnos) => (turnos === Infinity ? "∞" : turnos);
+  // Los decimales se muestran fijos: 51.995 y 51.9950 son el mismo número, pero
+  // la fórmula se lee mejor si todos los valores tienen el mismo formato.
+  const dec4 = (n) => n.toFixed(4);
 
-  const buildEquation = (attack, colorClass) => {
+  const buildEquation = (score, colorClass) => {
     const rivalClass = colorClass === "verde" ? "rojo" : "verde";
-    const via = attack.fisico ? "físico" : "especial";
-    const atqLabel = attack.fisico ? "Atq" : "Atq.Esp";
-    const defLabel = attack.fisico ? "Def.rival" : "Def.Esp.rival";
     const nota =
-      attack.turnos === Infinity
-        ? "No puede dañarlo: tipo inmune"
-        : `Ataque ${via} · tipo ${effectivenessLabel(attack.tipo)} (×${attack.tipo}) · velocidad ${attack.velocidad}`;
+      score.tipo === 0
+        ? "Tipo inmune: no puede puntuar"
+        : `Tipo ${effectivenessLabel(score.tipo)} (×${score.tipo})`;
     return `
     <div class="ecuacion">
-      <div class="ecuacion__label">Daño por turno</div>
-      <div class="formula" aria-label="Cálculo del daño por turno">
+      <div class="ecuacion__label">Puntuación</div>
+      <div class="formula" aria-label="Cálculo de la puntuación">
         <span class="formula-group">
-          ${chip(atqLabel, attack.ofensiva, colorClass)}
-          <span class="formula-op formula-op--div">÷</span>
-          ${chip(defLabel, attack.defensaRival, rivalClass)}
+          <span class="formula-paren">(</span>
+          ${chip("HP", score.hp, colorClass)}
+          <span class="formula-op">×</span>
+          <span class="formula-paren">(</span>
+          ${chip("Atq", score.ataque, colorClass)}
+          <span class="formula-op">+</span>
+          ${chip("Atq.Esp", score.ataqueEspecial, colorClass)}
+          <span class="formula-paren">)</span>
+          <span class="formula-paren">)</span>
+        </span>
+        <span class="formula-op formula-op--div">÷</span>
+        <span class="formula-group">
+          <span class="formula-paren">(</span>
+          ${chip("Def.rival", score.defensaRival, rivalClass)}
+          <span class="formula-op">+</span>
+          ${chip("Def.Esp.rival", score.defensaEspecialRival, rivalClass)}
+          <span class="formula-paren">)</span>
         </span>
         <span class="formula-op">×</span>
-        ${chip("Potencia", POTENCIA_BASE, "neutral")}
-        <span class="formula-op">×</span>
-        ${chip("Tipo", attack.tipo, colorClass)}
-        <span class="formula-op">×</span>
-        ${chip("Suerte", attack.suerte, colorClass)}
-        <span class="formula-op">=</span>
-        ${chip("Daño", attack.golpe, colorClass)}
-      </div>
-      <div class="ecuacion__label">Turnos para noquear</div>
-      <div class="formula" aria-label="Cálculo de turnos para noquear">
         <span class="formula-group">
-          ${chip("HP.rival", attack.hpRival, rivalClass)}
+          <span class="formula-paren">(</span>
+          ${chip("Vel", score.velocidad, colorClass)}
           <span class="formula-op formula-op--div">÷</span>
-          ${chip("Daño", attack.golpe, colorClass)}
+          <span class="formula-chip formula-chip--neutral"><span class="formula-chip__val">100</span></span>
+          <span class="formula-paren">)</span>
         </span>
+        <span class="formula-op">×</span>
+        ${chip("Tipo", score.tipo, colorClass)}
+        <span class="formula-op">×</span>
+        ${chip("Suerte", dec4(score.suerte), colorClass)}
       </div>
       <div class="ecuacion__result">
         <span class="ecuacion__equals">=</span>
-        <span class="power-result power-result--${colorClass}">${turnosTexto(attack.turnos)}</span>
-        <span class="ecuacion__unit">${attack.turnos === 1 ? "turno" : "turnos"}</span>
+        <span class="power-result power-result--${colorClass}">${dec4(score.puntuacion)}</span>
       </div>
       <p class="ecuacion__note">${nota}</p>
     </div>`;
@@ -412,41 +419,42 @@ async function combat() {
 
   const roleOf = (poke) => (poke.id === pokemon1.id ? "Local" : "Visitante");
 
-  // Gana quien noquea en menos turnos; a igualdad de turnos golpea primero el más rápido.
+  // Gana la puntuación más alta. Solo empatan si ambas son 0 (inmunidad mutua):
+  // ahí decide la velocidad, que si no el combate quedaría sin resolver.
   let winner = null;
-  if (ataque1.turnos !== ataque2.turnos) {
-    winner = ataque1.turnos < ataque2.turnos ? pokemon1 : pokemon2;
-  } else if (ataque1.velocidad !== ataque2.velocidad) {
-    winner = ataque1.velocidad > ataque2.velocidad ? pokemon1 : pokemon2;
+  if (score1.puntuacion !== score2.puntuacion) {
+    winner = score1.puntuacion > score2.puntuacion ? pokemon1 : pokemon2;
+  } else if (score1.velocidad !== score2.velocidad) {
+    winner = score1.velocidad > score2.velocidad ? pokemon1 : pokemon2;
   }
 
   if (winner) {
     const ganaLocal = winner === pokemon1;
     const ganaPoke = ganaLocal ? pokemon1 : pokemon2;
     const pierdePoke = ganaLocal ? pokemon2 : pokemon1;
-    const ganaAtaque = ganaLocal ? ataque1 : ataque2;
-    const pierdeAtaque = ganaLocal ? ataque2 : ataque1;
-    const mismoTurnos = ataque1.turnos === ataque2.turnos;
+    const ganaScore = ganaLocal ? score1 : score2;
+    const pierdeScore = ganaLocal ? score2 : score1;
+    const mismaPuntuacion = score1.puntuacion === score2.puntuacion;
     result$$.innerHTML = `
       <div class="combat-result">
-        ${combatPanel(roleOf(ganaPoke), ganaPoke.name, "ganador", buildEquation(ganaAtaque, "verde"))}
-        <p class="gana">${mismoTurnos ? "golpea primero y gana a" : "gana el combate a"}</p>
-        ${combatPanel(roleOf(pierdePoke), pierdePoke.name, "perdedor", buildEquation(pierdeAtaque, "rojo"))}
+        ${combatPanel(roleOf(ganaPoke), ganaPoke.name, "ganador", buildEquation(ganaScore, "verde"))}
+        <p class="gana">${mismaPuntuacion ? "es más rápido y gana a" : "gana el combate a"}</p>
+        ${combatPanel(roleOf(pierdePoke), pierdePoke.name, "perdedor", buildEquation(pierdeScore, "rojo"))}
       </div>
     `;
     drawCombatCards(pokemon1, pokemon2, winner);
     console.log(
-      `${ganaPoke.name} ${turnosTexto(ganaAtaque.turnos)} turnos - ${pierdePoke.name} ${turnosTexto(pierdeAtaque.turnos)} turnos`
+      `${ganaPoke.name} ${ganaScore.puntuacion} - ${pierdePoke.name} ${pierdeScore.puntuacion}`
     );
   } else {
     result$$.innerHTML = `
       <div class="combat-result combat-result--empate">
-        <p class="gana">¡Empate a ${turnosTexto(ataque1.turnos)} turnos y misma velocidad!</p>
+        <p class="gana">¡Empate a ${score1.puntuacion.toFixed(4)} puntos y misma velocidad!</p>
         ${combatNameBlock("Local", pokemon1.name, "empate")}
         ${combatNameBlock("Visitante", pokemon2.name, "empate")}
       </div>
     `;
     drawCombatCards(pokemon1, pokemon2, null);
-    console.log(`Empatan a ${turnosTexto(ataque1.turnos)} turnos`);
+    console.log(`Empatan a ${score1.puntuacion} puntos`);
   }
 }

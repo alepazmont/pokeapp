@@ -795,14 +795,6 @@ img.iconType {
     color: #445;
 }
 
-.ecuacion__unit {
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #556;
-}
-
 .ecuacion__note {
     margin: 0;
     font-size: 0.62rem;
