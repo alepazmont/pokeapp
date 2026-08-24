@@ -7,40 +7,102 @@ body {
     background-size: cover;
 }
 
+:root {
+    --brand-yellow: #ffe100;
+    --brand-blue: #0c0c92;
+    --brand-blue-deep: #040459;
+}
+
+/* Sticky en lugar de fixed: la barra ocupa su sitio en el flujo, así que el
+contenido no necesita compensar su altura con márgenes a mano y puede crecer
+al plegarse en pantallas estrechas sin taparlo. */
 header {
-    color: #ffe100;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    color: var(--brand-yellow);
+}
+
+.header-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem 1.5rem;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(180deg, var(--brand-blue) 0%, var(--brand-blue-deep) 100%);
+    border-bottom: 4px solid var(--brand-yellow);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+header #logo {
+    width: 120px;
+    flex: none;
 }
 
 .filters {
     display: flex;
     flex-direction: row;
-}
-
-.header-bar {
-    background-color: #0c0c92;
-    display: flex;
-    align-items: center;
-    margin: 0 auto;
     flex-wrap: wrap;
-    position: fixed;
-    width: 100%;
-    z-index: 99999;
-    margin-top: -120px;
-    justify-content: center;
+    align-items: center;
+    gap: 0.75rem 1rem;
 }
 
-header div img {
-    width: 120px;
+/* Los fieldset del navegador desentonaban con las cartas: mismo marco amarillo. */
+.header-bar fieldset {
+    margin: 0;
+    padding: 0.35rem 0.7rem 0.5rem;
+    border: 2px solid rgba(255, 225, 0, 0.55);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
 }
 
-div#selector,
-div#search {
-    margin-left: 30px;
+.header-bar legend {
+    padding: 0 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--brand-yellow);
+}
+
+.header-bar select,
+.header-bar input,
+.header-bar button {
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: #fff;
+    background: rgba(4, 4, 89, 0.75);
+    border: 1px solid rgba(255, 225, 0, 0.45);
+    border-radius: 7px;
+    padding: 0.28rem 0.45rem;
+}
+
+.header-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.header-bar select:focus-visible,
+.header-bar input:focus-visible,
+.header-bar button:focus-visible {
+    outline: 2px solid var(--brand-yellow);
+    outline-offset: 2px;
+}
+
+.header-bar button {
+    font-weight: 700;
+    color: var(--brand-blue-deep);
+    background: var(--brand-yellow);
+    border-color: var(--brand-yellow);
+    cursor: pointer;
+}
+
+.header-bar button:hover {
+    background: #fff06b;
 }
 
 /* Rejilla fluida: tantas columnas como quepan al ancho disponible. */
 .main {
-    margin-top: -25px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(292px, 1fr));
     justify-items: center;
@@ -173,7 +235,8 @@ p.exp {
 }
 
 .container {
-    margin-left: 60px;
+    display: flex;
+    align-items: center;
 }
 
 p {
@@ -248,39 +311,41 @@ img.iconType {
 
     /* Las cartas se reducen mucho en móvil: el mínimo de columna baja con ellas. */
     .main {
-        margin-top: 10px;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     }
 
-    .filters {
-        flex-direction: row;
-    }
-
-    select {
-        font-size: 12px;
-    }
-
-    input {
-        font-size: 10px;
+    /* Plegada ocupa más de un cuarto de pantalla: mejor que se vaya con el scroll. */
+    header {
+        position: static;
     }
 
     .header-bar {
-        flex-direction: column;
+        gap: 0.5rem 0.75rem;
+        padding: 0.5rem 0.7rem;
         text-align: center;
-        position: initial;
-        margin-top: 0px;
-        font-size: 10px;
     }
 
-    div#selector,
-    div#search,
-    .container {
-        margin-left: 0px;
-        margin-top: 10px;
+    header #logo {
+        width: 88px;
     }
 
-    .container {
-        margin-bottom: 20px;
+    .header-bar fieldset {
+        padding: 0.25rem 0.5rem 0.4rem;
+    }
+
+    .header-bar legend {
+        font-size: 0.6rem;
+    }
+
+    .header-bar select,
+    .header-bar input,
+    .header-bar button {
+        font-size: 0.72rem;
+        padding: 0.22rem 0.35rem;
+    }
+
+    .infoClick {
+        font-size: 0.72rem;
     }
 
     .card {
@@ -785,7 +850,20 @@ img.iconType {
     }
 }
 
+/* Durante la carga el texto aún no está puesto: sin esto se ve la píldora vacía. */
+.infoClick:empty {
+    display: none;
+}
+
 .infoClick {
-    margin: 120px 0 30px;
+    margin: 1.1rem auto 1.25rem;
+    padding: 0.3rem 0.9rem;
+    width: fit-content;
+    max-width: calc(100% - 1.5rem);
     text-align: center;
+    font-size: 0.85rem;
+    color: var(--brand-yellow);
+    text-shadow: 0 0 2px var(--brand-blue-deep), 0 0 5px var(--brand-blue-deep);
+    background: rgba(4, 4, 89, 0.4);
+    border-radius: 999px;
 }

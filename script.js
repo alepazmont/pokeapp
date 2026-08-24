@@ -15,8 +15,9 @@ const statValue = (poke, name) => {
   return found ? found.base_stat : 0;
 };
 
+// flex, no block: el velo centra su panel con flexbox y el estilo en línea manda.
 const showLoader = () => {
-  loader$$.style.display = "block";
+  loader$$.style.display = "flex";
 };
 
 const hideLoader = () => {
@@ -333,7 +334,7 @@ const showCombatLoader = () => {
   }
 
   return new Promise(resolve => {
-    combatLoader$$.style.display = "block";
+    combatLoader$$.style.display = "flex";
     setTimeout(() => {
       resolve();
     }, 4000); // 4000 milisegundos de tiempo de espera

@@ -1,62 +1,50 @@
-/* LOADER */
+/* Los velos van por debajo de la cabecera (z-index 50) para no desteñirla. */
 
-#loader-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999999;
-}
-
-h2 {
-    text-align: center;
-    font-size: 50px;
-}
-
-img#loading-gif {
-    display: block;
-    margin: 0 auto;
-}
-
-#loader-info {
-    margin: 150px 0px;
-}
-
-/* COMBAT */
-
+#loader-screen,
 div#combat-loader-screen {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.7);
+    inset: 0;
+    background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.72), rgba(4, 4, 89, 0.55));
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 9999999;
+    z-index: 40;
 }
 
+#loader-info,
 div#combat-loader {
-    margin-top: 100px;
+    margin: 0;
+    padding: 1.5rem 2rem 1.75rem;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(12, 12, 146, 0.92), rgba(4, 4, 89, 0.95));
+    border: 3px solid #ffe100;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+    text-align: center;
 }
 
+#loader-info h2,
 #combat-loader h2 {
-    margin-bottom: 0;
+    margin: 0 0 1rem;
+    font-size: clamp(1.1rem, 4vw, 1.6rem);
+    color: #ffe100;
+    text-shadow: 0 0 2px #040459, 0 0 6px #040459;
 }
 
+img#loading-gif,
 img#combat-gif {
     display: block;
     margin: 0 auto;
-    width: 300px;
+}
+
+img#loading-gif {
+    width: clamp(110px, 22vw, 160px);
+}
+
+img#combat-gif {
+    width: clamp(180px, 38vw, 300px);
 }
 
 img.dotsanimation {
-    width: 37px;
+    width: 28px;
     margin-bottom: -2px;
 }
