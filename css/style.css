@@ -405,12 +405,22 @@ img.iconType {
 }
 
 .ecuacion {
-    font-size: 25px;
+    font-size: 22px;
     color: #000;
     text-shadow: none;
+    line-height: 1.55;
 }
 .ecuacion .verde, .ecuacion .rojo {
     text-shadow: 0 0 3px #fff;
+}
+.ecuacion .attr-label {
+    font-size: 0.72em;
+    font-weight: 700;
+    color: #222;
+    opacity: 0.85;
+}
+.ecuacion .power-result {
+    font-weight: 700;
 }
 .verde {
     color: #227922;

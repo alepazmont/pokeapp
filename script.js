@@ -270,271 +270,138 @@ async function combat() {
   const defensaEspecial2 = pokemon2.stats[4].base_stat;
   const velocidad2 = pokemon2.stats[5].base_stat;
 
-// Factor aleatorio entre 0.85 y ventaja5 con redondeo a tres decimales. Algo parecido a la suerte en un combate.
-const factorAleatorio1 = (0.85 + Math.random() * 0.3);
-const factorAleatorio2 = (0.85 + Math.random() * 0.3);
-  
+  const round4 = (n) => Number(n.toFixed(4));
 
-// Cálculo de la efectividad de un Pókemon frente a otro. Imprescindible en un combate Pokémon.
+  // Factor aleatorio 0.85–1.15 (suerte del combate), a 4 decimales.
+  const factorAleatorio1 = round4(0.85 + Math.random() * 0.3);
+  const factorAleatorio2 = round4(0.85 + Math.random() * 0.3);
+
+  // Efectividad de tipo atacante → tipo rival.
   function getEffectiveness(objArray, pokemon1Type, pokemon2Type) {
-    // Convierte los tipos de Pokémon a minúsculas para que coincidan con las claves del objeto de efectividad.
     const type1 = pokemon1Type.toLowerCase();
     const type2 = pokemon2Type.toLowerCase();
-  
-    // Verifica si existen las claves de tipo en el objeto de efectividad.
-    if (objArray[type1] && objArray[type1][type2]) {
-        // Si existe la efectividad para ambos tipos, devuelve el valor de efectividad correspondiente.
-        return objArray[type1][type2];
-    } else {
-        // Si no se encuentra la efectividad, imprime un mensaje informativo y devuelve 1, efectividad estándar.
-        console.log("No se encontró una efectividad definida para estos tipos de Pokémon.");
-        return 1;
+    if (objArray[type1] && objArray[type1][type2] !== undefined) {
+      return objArray[type1][type2];
     }
-}
+    console.log("No se encontró una efectividad definida para estos tipos de Pokémon.");
+    return 1;
+  }
 
-  const multiplicadorTipo1 = getEffectiveness(effectiveness, pokemon1.mainType, pokemon2.mainType);
-  const multiplicadorTipo2 = getEffectiveness(effectiveness, pokemon2.mainType, pokemon1.mainType);
-  
+  const multiplicadorTipo1 = getEffectiveness(
+    effectiveness,
+    pokemon1.mainType,
+    pokemon2.mainType
+  );
+  const multiplicadorTipo2 = getEffectiveness(
+    effectiveness,
+    pokemon2.mainType,
+    pokemon1.mainType
+  );
 
-console.log(`Multiplicador ${pokemon1} = ${multiplicadorTipo1} | Multiplicador ${pokemon1} =  ${multiplicadorTipo2}`);
-    
+  const power1 = round4(
+    ((hp1 * (ataque1 + ataqueEspecial1)) / (defensa2 + defensaEspecial2)) *
+      (velocidad1 / 100) *
+      multiplicadorTipo1 *
+      factorAleatorio1
+  );
+  const power2 = round4(
+    ((hp2 * (ataque2 + ataqueEspecial2)) / (defensa1 + defensaEspecial1)) *
+      (velocidad2 / 100) *
+      multiplicadorTipo2 *
+      factorAleatorio2
+  );
 
-  const power1 =
-    (((hp1 * (ataque1 + ataqueEspecial1)) / (defensa2 + defensaEspecial2)) *
-    (velocidad1 / 100) *
-    multiplicadorTipo1 *
-    factorAleatorio1);
-  const power2 =
-    (((hp2 * (ataque2 + ataqueEspecial2)) / (defensa1 + defensaEspecial1)) *
-    (velocidad2 / 100) *
-    multiplicadorTipo2 *
-    factorAleatorio2);
+  const term = (attr, value, colorClass) =>
+    `<mrow><mtext class="attr-label">${attr}&nbsp;</mtext><mn class="${colorClass}">${value}</mn></mrow>`;
+
+  // own = stats of attacker; against = rival defenses used in the denominator.
+  const buildEquation = (own, against, colorClass, power) => `
+    <div class="ecuacion">Power = (<math xmlns="http://www.w3.org/1998/Math/MathML">
+      <mfenced>
+        <mfrac>
+          <mrow>
+            ${term("HP", own.hp, colorClass)}
+            <mo>×</mo>
+            <mo>(</mo>
+            ${term("Atq", own.ataque, colorClass)}
+            <mo>+</mo>
+            ${term("Atq.Esp", own.ataqueEspecial, colorClass)}
+            <mo>)</mo>
+          </mrow>
+          <mrow>
+            ${term("Def.rival", against.defensa, colorClass === "verde" ? "rojo" : "verde")}
+            <mo>+</mo>
+            ${term("Def.Esp.rival", against.defensaEspecial, colorClass === "verde" ? "rojo" : "verde")}
+          </mrow>
+        </mfrac>
+      </mfenced>
+      <mo>×</mo>
+      <mfenced>
+        <mfrac>
+          ${term("Vel", own.velocidad, colorClass)}
+          <mn>100</mn>
+        </mfrac>
+      </mfenced>
+      <mo>×</mo>
+      ${term("Tipo", own.multiplicadorTipo, colorClass)}
+      <mo>×</mo>
+      ${term("Suerte", own.factorAleatorio, colorClass)}
+    </math>) = <span class="${colorClass} power-result">${power}</span></div>
+  `;
+
+  const stats1 = {
+    hp: hp1,
+    ataque: ataque1,
+    ataqueEspecial: ataqueEspecial1,
+    velocidad: velocidad1,
+    multiplicadorTipo: multiplicadorTipo1,
+    factorAleatorio: factorAleatorio1,
+  };
+  const stats2 = {
+    hp: hp2,
+    ataque: ataque2,
+    ataqueEspecial: ataqueEspecial2,
+    velocidad: velocidad2,
+    multiplicadorTipo: multiplicadorTipo2,
+    factorAleatorio: factorAleatorio2,
+  };
+  const def1 = { defensa: defensa1, defensaEspecial: defensaEspecial1 };
+  const def2 = { defensa: defensa2, defensaEspecial: defensaEspecial2 };
 
   let winner;
   let looser;
 
-
   if (power1 > power2) {
     winner = pokemon1;
     looser = pokemon2;
-
-    const resultText = `
-    <div class="ganador">${pokemon1.name}</div><br>
-    <div class="ecuacion">Power  = (<math xmlns="http://www.w3.org/1998/Math/MathML">
-    <mfenced>
-        <mtable>
-            <mtr>
-                <mtd>
-                    <mfrac>
-                        <mrow>
-                            <mo class="verde">${hp1}</mo>
-                            <mo>×</mo>
-                            <mo>(</mo>
-                            <mo class="verde">${ataque1}</mo>
-                            <mo>+</mo>
-                            <mo class="verde">${ataqueEspecial1}</mo>
-                            <mo>)</mo>
-                        </mrow>
-                        <mrow>
-                            <mo class="rojo">${defensa1}</mo>
-                            <mo>+</mo>
-                            <mo class="rojo">${defensaEspecial1}</mo>
-                        </mrow>
-                    </mfrac>
-                </mtd>
-            </mtr>
-        </mtable>
-    </mfenced>
-    <mo>×</mo>
-    <mfenced>
-        <mtable>
-            <mtr>
-                <mtd>
-                    <mfrac>
-                        <mrow>
-                            <mo class="verde">${velocidad1}</mo>
-                        </mrow>
-                        <mn>100</mn>
-                    </mfrac>
-                </mtd>
-            </mtr>
-        </mtable>
-    </mfenced>
-    <mo>×</mo>
-    <mo class="verde">${multiplicadorTipo1}</mo>
-    <mo>×</mo>
-    <mo class="verde">${factorAleatorio1}</mo>
-</math>) = ${power1}</div><br>
-    <div class="gana">gana el combate a</div><br>
-    <div class="perdedor">${pokemon2.name}</div><br>
-    <div class="ecuacion">Power  = (<math xmlns="http://www.w3.org/1998/Math/MathML">
-    <mfenced>
-        <mtable>
-            <mtr>
-                <mtd>
-                    <mfrac>
-                        <mrow>
-                            <mo class="rojo">${hp2}</mo>
-                            <mo>×</mo>
-                            <mo>(</mo>
-                            <mo class="rojo">${ataque2}</mo>
-                            <mo>+</mo>
-                            <mo class="rojo">${ataqueEspecial2}</mo>
-                            <mo>)</mo>
-                        </mrow>
-                        <mrow>
-                            <mo class="verde">${defensa2}</mo>
-                            <mo>+</mo>
-                            <mo class="verde">${defensaEspecial2}</mo>
-                        </mrow>
-                    </mfrac>
-                </mtd>
-            </mtr>
-        </mtable>
-    </mfenced>
-    <mo>×</mo>
-    <mfenced>
-        <mtable>
-            <mtr>
-                <mtd>
-                    <mfrac>
-                        <mrow>
-                            <mo class="rojo">${velocidad2}</mo>
-                        </mrow>
-                        <mn>100</mn>
-                    </mfrac>
-                </mtd>
-            </mtr>
-        </mtable>
-    </mfenced>
-    <mo>×</mo>
-    <mo class="rojo">${multiplicadorTipo2}</mo>
-    <mo>×</mo>
-    <mo class="rojo">${factorAleatorio2}</mo>
-</math>) = ${power2}</div>  
-`;
-
-result$$.innerHTML = resultText;
-
-main$$.innerHTML = "";
-
-drawCards([winner, looser]);
-
-console.log(pokemon1.name, power1, "-", pokemon2.name, power2);
-
+    result$$.innerHTML = `
+      <div class="ganador">${pokemon1.name}</div><br>
+      ${buildEquation(stats1, def2, "verde", power1)}
+      <br>
+      <div class="gana">gana el combate a</div><br>
+      <div class="perdedor">${pokemon2.name}</div><br>
+      ${buildEquation(stats2, def1, "rojo", power2)}
+    `;
+    main$$.innerHTML = "";
+    drawCards([winner, looser]);
+    console.log(pokemon1.name, power1, "-", pokemon2.name, power2);
   } else if (power1 < power2) {
     winner = pokemon2;
-    looser = pokemon1;    
-    const resultText = `
-    <div class="ganador">${pokemon2.name}</div><br>
-    <div class="ecuacion">Power  = (<math xmlns="http://www.w3.org/1998/Math/MathML">
-    <mfenced>
-        <mtable>
-            <mtr>
-                <mtd>
-                    <mfrac>
-                        <mrow>
-                            <mo class="verde">${hp2}</mo>
-                            <mo>×</mo>
-                            <mo>(</mo>
-                            <mo class="verde">${ataque2}</mo>
-                            <mo>+</mo>
-                            <mo class="verde">${ataqueEspecial2}</mo>
-                            <mo>)</mo>
-                        </mrow>
-                        <mrow>
-                            <mo class="rojo">${defensa2}</mo>
-                            <mo>+</mo>
-                            <mo class="rojo">${defensaEspecial2}</mo>
-                        </mrow>
-                    </mfrac>
-                </mtd>
-            </mtr>
-        </mtable>
-    </mfenced>
-    <mo>×</mo>
-    <mfenced>
-        <mtable>
-            <mtr>
-                <mtd>
-                    <mfrac>
-                        <mrow>
-                            <mo class="verde">${velocidad2}</mo>
-                        </mrow>
-                        <mn>100</mn>
-                    </mfrac>
-                </mtd>
-            </mtr>
-        </mtable>
-    </mfenced>
-    <mo>×</mo>
-    <mo class="verde">${multiplicadorTipo2}</mo>
-    <mo>×</mo>
-    <mo class="verde">${factorAleatorio2}</mo>
-</math>) = ${power2}</div><br>
-    <div class="gana">gana el combate a</div><br>
-    <div class="perdedor">${pokemon1.name}</div><br>
-    <div class="ecuacion">(Power  = (<math xmlns="http://www.w3.org/1998/Math/MathML">
-    <mfenced>
-        <mtable>
-            <mtr>
-                <mtd>
-                    <mfrac>
-                        <mrow>
-                            <mo class="rojo">${hp1}</mo>
-                            <mo>×</mo>
-                            <mo>(</mo>
-                            <mo class="rojo">${ataque1}</mo>
-                            <mo>+</mo>
-                            <mo class="rojo">${ataqueEspecial1}</mo>
-                            <mo>)</mo>
-                        </mrow>
-                        <mrow>
-                            <mo class="verde">${defensa1}</mo>
-                            <mo>+</mo>
-                            <mo class="verde">${defensaEspecial1}</mo>
-                        </mrow>
-                    </mfrac>
-                </mtd>
-            </mtr>
-        </mtable>
-    </mfenced>
-    <mo>×</mo>
-    <mfenced>
-        <mtable>
-            <mtr>
-                <mtd>
-                    <mfrac>
-                        <mrow>
-                            <mo class="rojo">${velocidad1}</mo>
-                        </mrow>
-                        <mn>100</mn>
-                    </mfrac>
-                </mtd>
-            </mtr>
-        </mtable>
-    </mfenced>
-    <mo>×</mo>
-    <mo class="rojo">${multiplicadorTipo1}</mo>
-    <mo>×</mo>
-    <mo class="rojo">${factorAleatorio1}</mo>
-</math>) = ${power1}</div>  
-`;
-
-
-result$$.innerHTML = resultText;
-
-main$$.innerHTML = "";
-
-drawCards([winner, looser]);
-
-console.log(pokemon2.name, power2, "-", pokemon1.name, power1);
-
-} else {
-document.getElementById("result").textContent = `¡Empate!`;
-drawCards([pokemon1, pokemon2]);
-
-console.log(`Empatan ${power1} = ${power2}`);
-}
-
+    looser = pokemon1;
+    result$$.innerHTML = `
+      <div class="ganador">${pokemon2.name}</div><br>
+      ${buildEquation(stats2, def1, "verde", power2)}
+      <br>
+      <div class="gana">gana el combate a</div><br>
+      <div class="perdedor">${pokemon1.name}</div><br>
+      ${buildEquation(stats1, def2, "rojo", power1)}
+    `;
+    main$$.innerHTML = "";
+    drawCards([winner, looser]);
+    console.log(pokemon2.name, power2, "-", pokemon1.name, power1);
+  } else {
+    result$$.innerHTML = `<div class="gana">¡Empate! (${power1} = ${power2})</div>`;
+    drawCards([pokemon1, pokemon2]);
+    console.log(`Empatan ${power1} = ${power2}`);
+  }
 }
