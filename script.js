@@ -125,10 +125,17 @@ const drawCombatCards = (local, visitante, winner) => {
 };
 
 const combatNameBlock = (role, name, kind) => `
-  <div class="combat-name combat-name--${kind}">
+  <header class="combat-name combat-name--${kind}">
     <span class="combat-role-label">${role}</span>
     <span class="combat-poke-name">${name}</span>
-  </div>
+  </header>
+`;
+
+const combatPanel = (role, name, kind, equationHtml) => `
+  <article class="combat-panel combat-panel--${kind}">
+    ${combatNameBlock(role, name, kind)}
+    ${equationHtml}
+  </article>
 `;
 
 const drawInput = () => {
@@ -345,43 +352,53 @@ async function combat() {
       factorAleatorio2
   );
 
-  const term = (attr, value, colorClass) =>
-    `<mrow><mtext class="attr-label">${attr}&nbsp;</mtext><mn class="${colorClass}">${value}</mn></mrow>`;
+  const chip = (attr, value, colorClass) =>
+    `<span class="formula-chip formula-chip--${colorClass}"><span class="formula-chip__attr">${attr}</span><span class="formula-chip__val">${value}</span></span>`;
 
-  // own = stats of attacker; against = rival defenses used in the denominator.
-  const buildEquation = (own, against, colorClass, power) => `
-    <div class="ecuacion">Power = (<math xmlns="http://www.w3.org/1998/Math/MathML">
-      <mfenced>
-        <mfrac>
-          <mrow>
-            ${term("HP", own.hp, colorClass)}
-            <mo>×</mo>
-            <mo>(</mo>
-            ${term("Atq", own.ataque, colorClass)}
-            <mo>+</mo>
-            ${term("Atq.Esp", own.ataqueEspecial, colorClass)}
-            <mo>)</mo>
-          </mrow>
-          <mrow>
-            ${term("Def.rival", against.defensa, colorClass === "verde" ? "rojo" : "verde")}
-            <mo>+</mo>
-            ${term("Def.Esp.rival", against.defensaEspecial, colorClass === "verde" ? "rojo" : "verde")}
-          </mrow>
-        </mfrac>
-      </mfenced>
-      <mo>×</mo>
-      <mfenced>
-        <mfrac>
-          ${term("Vel", own.velocidad, colorClass)}
-          <mn>100</mn>
-        </mfrac>
-      </mfenced>
-      <mo>×</mo>
-      ${term("Tipo", own.multiplicadorTipo, colorClass)}
-      <mo>×</mo>
-      ${term("Suerte", own.factorAleatorio, colorClass)}
-    </math>) = <span class="${colorClass} power-result">${power}</span></div>
-  `;
+  const buildEquation = (own, against, colorClass, power) => {
+    const rivalClass = colorClass === "verde" ? "rojo" : "verde";
+    return `
+    <div class="ecuacion">
+      <div class="ecuacion__label">Power</div>
+      <div class="formula" aria-label="Ecuación de poder">
+        <span class="formula-group">
+          <span class="formula-paren">(</span>
+          ${chip("HP", own.hp, colorClass)}
+          <span class="formula-op">×</span>
+          <span class="formula-paren">(</span>
+          ${chip("Atq", own.ataque, colorClass)}
+          <span class="formula-op">+</span>
+          ${chip("Atq.Esp", own.ataqueEspecial, colorClass)}
+          <span class="formula-paren">)</span>
+          <span class="formula-paren">)</span>
+        </span>
+        <span class="formula-op formula-op--div">÷</span>
+        <span class="formula-group">
+          <span class="formula-paren">(</span>
+          ${chip("Def.rival", against.defensa, rivalClass)}
+          <span class="formula-op">+</span>
+          ${chip("Def.Esp.rival", against.defensaEspecial, rivalClass)}
+          <span class="formula-paren">)</span>
+        </span>
+        <span class="formula-op">×</span>
+        <span class="formula-group">
+          <span class="formula-paren">(</span>
+          ${chip("Vel", own.velocidad, colorClass)}
+          <span class="formula-op">÷</span>
+          <span class="formula-chip formula-chip--neutral"><span class="formula-chip__val">100</span></span>
+          <span class="formula-paren">)</span>
+        </span>
+        <span class="formula-op">×</span>
+        ${chip("Tipo", own.multiplicadorTipo, colorClass)}
+        <span class="formula-op">×</span>
+        ${chip("Suerte", own.factorAleatorio, colorClass)}
+      </div>
+      <div class="ecuacion__result">
+        <span class="ecuacion__equals">=</span>
+        <span class="power-result power-result--${colorClass}">${power}</span>
+      </div>
+    </div>`;
+  };
 
   const stats1 = {
     hp: hp1,
@@ -406,29 +423,31 @@ async function combat() {
 
   if (power1 > power2) {
     result$$.innerHTML = `
-      ${combatNameBlock(roleOf(pokemon1), pokemon1.name, "ganador")}
-      ${buildEquation(stats1, def2, "verde", power1)}
-      <div class="gana">gana el combate a</div>
-      ${combatNameBlock(roleOf(pokemon2), pokemon2.name, "perdedor")}
-      ${buildEquation(stats2, def1, "rojo", power2)}
+      <div class="combat-result">
+        ${combatPanel(roleOf(pokemon1), pokemon1.name, "ganador", buildEquation(stats1, def2, "verde", power1))}
+        <p class="gana">gana el combate a</p>
+        ${combatPanel(roleOf(pokemon2), pokemon2.name, "perdedor", buildEquation(stats2, def1, "rojo", power2))}
+      </div>
     `;
     drawCombatCards(pokemon1, pokemon2, pokemon1);
     console.log(pokemon1.name, power1, "-", pokemon2.name, power2);
   } else if (power1 < power2) {
     result$$.innerHTML = `
-      ${combatNameBlock(roleOf(pokemon2), pokemon2.name, "ganador")}
-      ${buildEquation(stats2, def1, "verde", power2)}
-      <div class="gana">gana el combate a</div>
-      ${combatNameBlock(roleOf(pokemon1), pokemon1.name, "perdedor")}
-      ${buildEquation(stats1, def2, "rojo", power1)}
+      <div class="combat-result">
+        ${combatPanel(roleOf(pokemon2), pokemon2.name, "ganador", buildEquation(stats2, def1, "verde", power2))}
+        <p class="gana">gana el combate a</p>
+        ${combatPanel(roleOf(pokemon1), pokemon1.name, "perdedor", buildEquation(stats1, def2, "rojo", power1))}
+      </div>
     `;
     drawCombatCards(pokemon1, pokemon2, pokemon2);
     console.log(pokemon2.name, power2, "-", pokemon1.name, power1);
   } else {
     result$$.innerHTML = `
-      <div class="gana">¡Empate! (${power1} = ${power2})</div>
-      ${combatNameBlock("Local", pokemon1.name, "empate")}
-      ${combatNameBlock("Visitante", pokemon2.name, "empate")}
+      <div class="combat-result combat-result--empate">
+        <p class="gana">¡Empate! (${power1} = ${power2})</p>
+        ${combatNameBlock("Local", pokemon1.name, "empate")}
+        ${combatNameBlock("Visitante", pokemon2.name, "empate")}
+      </div>
     `;
     drawCombatCards(pokemon1, pokemon2, null);
     console.log(`Empatan ${power1} = ${power2}`);

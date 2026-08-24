@@ -449,118 +449,312 @@ img.iconType {
 
 :root {
     --combat-red: #ff2424;
+    --combat-green: #2fd62f;
+    --combat-yellow: #ffe100;
+    --combat-ink: #0b0b3a;
+    --combat-panel: rgba(255, 255, 255, 0.92);
     --combat-red-shadow:
         0 0 2px #fff,
         0 0 3px #fff,
         0 0 2px #2a0000,
         0 0 5px #040459,
         0 0 7px #040459;
+    --combat-green-shadow:
+        0 0 2px #fff,
+        0 0 3px #0a2a0a,
+        0 0 5px #040459;
+}
+
+.mainContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: min(1100px, calc(100% - 1.5rem));
+    margin: 0 auto 3rem;
 }
 
 #result {
+    order: -1;
     text-align: center;
-    line-height: 1.2;
-    margin-top: 40px;
-    font-size: 40px;
-    z-index: 99999;
-    color: #ffe100;
-    text-shadow: 0px 0px 2px #040459, 0px 0px 5px #040459, 0px 0px 7px #040459;
+    line-height: 1.35;
+    margin: 0;
+    font-size: 1rem;
+    z-index: 2;
+    color: var(--combat-yellow);
     position: relative;
-    margin-bottom: 70px;
+}
+
+#result:empty {
+    display: none;
+}
+
+.combat-result {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: clamp(0.85rem, 2.5vw, 1.35rem);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(12, 12, 146, 0.88), rgba(4, 4, 89, 0.92));
+    border: 3px solid var(--combat-yellow);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.combat-panel {
+    background: var(--combat-panel);
+    border-radius: 14px;
+    padding: clamp(0.75rem, 2vw, 1.1rem);
+    text-align: left;
+    box-shadow: inset 0 0 0 2px rgba(4, 4, 89, 0.08);
+}
+
+.combat-panel--ganador {
+    box-shadow: inset 0 0 0 3px rgba(47, 214, 47, 0.55);
+}
+
+.combat-panel--perdedor {
+    box-shadow: inset 0 0 0 3px rgba(255, 36, 36, 0.45);
+    background: rgba(255, 255, 255, 0.82);
 }
 
 .combat-name {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    margin: 12px 0 6px;
+    align-items: flex-start;
+    gap: 0.15rem;
+    margin: 0 0 0.75rem;
 }
 
 .combat-role-label {
-    font-size: 14px;
+    font-size: clamp(0.7rem, 1.8vw, 0.8rem);
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     line-height: 1.2;
-    opacity: 0.95;
+    color: #445;
+    text-shadow: none;
 }
 
 .combat-poke-name {
-    font-size: 45px;
-    line-height: 1.1;
+    font-size: clamp(1.55rem, 5vw, 2.35rem);
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    text-shadow: none;
 }
 
 .combat-name--ganador .combat-role-label {
-    color: #9dff9d;
+    color: #1f7a1f;
 }
 
 .combat-name--ganador .combat-poke-name {
-    color: #3fcd3f;
+    color: #1f9e1f;
 }
 
-.combat-name--perdedor {
-    margin-top: 28px;
+.combat-name--perdedor .combat-role-label {
+    color: #a31818;
+    text-shadow: none;
 }
 
-.combat-name--perdedor .combat-role-label,
 .combat-name--perdedor .combat-poke-name,
 .perdedor {
-    color: var(--combat-red);
-    text-shadow: var(--combat-red-shadow);
+    color: #d41010;
+    text-shadow: none;
 }
 
-.combat-name--perdedor .combat-poke-name {
-    font-size: 45px;
+.combat-name--empate {
+    align-items: center;
+    margin: 0.35rem 0;
 }
 
 .combat-name--empate .combat-poke-name {
-    font-size: 32px;
-    color: #ffe100;
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    color: var(--combat-yellow);
+    text-shadow: 0 0 2px #040459, 0 0 5px #040459;
 }
 
 .ganador {
-    color: #3fcd3f;
-    font-size: 45px;
+    color: var(--combat-green);
+    font-size: clamp(1.55rem, 5vw, 2.35rem);
 }
 
 .gana {
-    font-size: 30px;
-    z-index: 99999;
-    color: #ffe100;
-    text-shadow: 0px 0px 2px #040459, 0px 0px 5px #040459, 0px 0px 7px #040459;
-    margin-top: 30px;
+    margin: 0.15rem auto;
+    padding: 0.35rem 0.9rem;
+    width: fit-content;
+    max-width: 100%;
+    font-size: clamp(1rem, 3.2vw, 1.35rem);
+    font-weight: 700;
+    z-index: 2;
+    color: var(--combat-yellow);
+    text-shadow: 0 0 2px #040459, 0 0 5px #040459, 0 0 7px #040459;
+    background: rgba(0, 0, 0, 0.22);
+    border-radius: 999px;
 }
 
 .perdedor {
-    font-size: 45px;
-    margin-top: 25px;
+    font-size: clamp(1.55rem, 5vw, 2.35rem);
+    margin-top: 0;
 }
 
 .ecuacion {
-    font-size: 22px;
-    color: #000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    font-size: clamp(0.85rem, 2.4vw, 1rem);
+    color: var(--combat-ink);
     text-shadow: none;
-    line-height: 1.55;
+    line-height: 1.4;
 }
-.ecuacion .verde, .ecuacion .rojo {
-    text-shadow: 0 0 3px #fff, 0 0 2px #fff;
+
+.ecuacion__label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #556;
 }
-.ecuacion .attr-label {
-    font-size: 0.72em;
+
+.formula {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.4rem;
+}
+
+.formula-group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.35rem;
+    border-radius: 10px;
+    background: rgba(12, 12, 146, 0.06);
+}
+
+.formula-paren,
+.formula-op {
     font-weight: 700;
-    color: #222;
-    opacity: 0.85;
+    color: #334;
 }
-.ecuacion .power-result {
-    font-weight: 700;
+
+.formula-op--div {
+    font-size: 1.15em;
 }
+
+.formula-chip {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 3.1rem;
+    padding: 0.28rem 0.45rem;
+    border-radius: 8px;
+    background: #fff;
+    border: 1.5px solid rgba(0, 0, 0, 0.12);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    line-height: 1.15;
+}
+
+.formula-chip__attr {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #556;
+}
+
+.formula-chip__val {
+    font-size: clamp(0.95rem, 2.6vw, 1.1rem);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.formula-chip--verde {
+    border-color: rgba(31, 158, 31, 0.45);
+    background: #f2fff2;
+}
+
+.formula-chip--verde .formula-chip__val {
+    color: #1a8a1a;
+}
+
+.formula-chip--rojo {
+    border-color: rgba(212, 16, 16, 0.45);
+    background: #fff3f3;
+}
+
+.formula-chip--rojo .formula-chip__val {
+    color: #c40f0f;
+}
+
+.formula-chip--neutral {
+    background: #f4f4f8;
+}
+
+.formula-chip--neutral .formula-chip__val {
+    color: #333;
+}
+
+.ecuacion__result {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    padding-top: 0.35rem;
+    border-top: 1px dashed rgba(4, 4, 89, 0.2);
+}
+
+.ecuacion__equals {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #445;
+}
+
+.power-result {
+    font-size: clamp(1.35rem, 4.5vw, 1.85rem);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+}
+
+.power-result--verde {
+    color: #1a8a1a;
+}
+
+.power-result--rojo {
+    color: #c40f0f;
+}
+
 .verde {
-    color: #227922;
+    color: #1a8a1a;
 }
 
 .rojo {
     color: var(--combat-red);
+}
+
+@media (max-width: 640px) {
+    .combat-result {
+        gap: 0.85rem;
+        border-width: 2px;
+    }
+
+    .formula-group {
+        width: 100%;
+    }
+
+    .ecuacion__result {
+        justify-content: center;
+    }
+
+    .card-slot {
+        width: min(100%, 280px);
+    }
+
+    .card-slot .card {
+        width: 100%;
+        box-sizing: border-box;
+    }
 }
 
 .infoClick {
