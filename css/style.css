@@ -80,7 +80,7 @@ div#search {
 }
 
 .card--winner {
-    animation: card-bounce 2.4s ease-in-out infinite;
+    animation: card-bounce 5.5s ease-in-out infinite;
     transform-origin: center center;
     will-change: transform;
 }
@@ -89,10 +89,11 @@ div#search {
     filter: brightness(0.45) saturate(0.55);
     opacity: 0.78;
     box-shadow: 4px 4px 10px #00000066;
+    transform: rotate(4deg);
 }
 
 .card--loser:hover {
-    transform: none;
+    transform: rotate(4deg);
     filter: brightness(0.5) saturate(0.6);
 }
 
@@ -118,7 +119,7 @@ div#search {
 }
 
 .card--winner:hover {
-    animation: card-bounce 2.4s ease-in-out infinite;
+    animation: card-bounce 5.5s ease-in-out infinite;
     transform: unset;
     z-index: 9999;
 }
@@ -282,12 +283,12 @@ img.iconType {
     }
 
     .card--winner:hover {
-        animation: card-bounce 2.4s ease-in-out infinite;
+        animation: card-bounce 5.5s ease-in-out infinite;
         transform: unset;
     }
 
     .card--loser:hover {
-        transform: none;
+        transform: rotate(4deg);
     }
 
     .cardInfo td {
@@ -496,8 +497,6 @@ img.iconType {
 
 .combat-name--ganador .combat-poke-name {
     color: #3fcd3f;
-    animation: card-bounce 2.4s ease-in-out infinite;
-    display: inline-block;
 }
 
 .combat-name--perdedor {
