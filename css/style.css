@@ -644,7 +644,8 @@ img.iconType {
 }
 
 .formula-op--div {
-    font-size: 1.05em;
+    font-size: 1.35em;
+    color: #223;
 }
 
 .formula-chip {
@@ -714,6 +715,23 @@ img.iconType {
     font-size: 0.95rem;
     font-weight: 800;
     color: #445;
+}
+
+.ecuacion__unit {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #556;
+}
+
+.ecuacion__note {
+    margin: 0;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #667;
 }
 
 .power-result {

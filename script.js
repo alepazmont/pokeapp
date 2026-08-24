@@ -9,6 +9,12 @@ const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
+// Lee la stat por nombre en lugar de por posición del array de PokéAPI.
+const statValue = (poke, name) => {
+  const found = poke.stats.find((entry) => entry.stat.name === name);
+  return found ? found.base_stat : 0;
+};
+
 const showLoader = () => {
   loader$$.style.display = "block";
 };
@@ -92,12 +98,12 @@ const drawCards = (pokemon, combatMeta = null) => {
         </td>
           <td>
           <p><b>Estadísticas:</b><br>
-          HP: ${poke.stats[0].base_stat}<br>
-          Ataque: ${poke.stats[1].base_stat}<br>
-          Defensa: ${poke.stats[2].base_stat}<br>
-          Ataq. Esp.: ${poke.stats[3].base_stat}<br>
-          Def. Esp.: ${poke.stats[4].base_stat}<br>
-          Velocidad: ${poke.stats[5].base_stat}<br>
+          HP: ${statValue(poke, "hp")}<br>
+          Ataque: ${statValue(poke, "attack")}<br>
+          Defensa: ${statValue(poke, "defense")}<br>
+          Ataq. Esp.: ${statValue(poke, "special-attack")}<br>
+          Def. Esp.: ${statValue(poke, "special-defense")}<br>
+          Velocidad: ${statValue(poke, "speed")}<br>
           </p>
          </td>
       </tr>
@@ -232,25 +238,78 @@ const combatButton = document.getElementById("combat-button").addEventListener("
 const penalizacion = 0.7;
 const ventaja = 1.3;
 
+/* Tabla de efectividad SIEMPRE en clave ofensiva: effectiveness[atacante][defensor].
+Escala suavizada respecto al juego (2 → 1.3 y 0.5 → 0.7) para que el tipo influya
+sin decidir el combate por sí solo. El 0 sí es inmunidad real. */
 const effectiveness = {
   normal: { normal: 1, fighting: 1, flying: 1, poison: 1, ground: 1, rock: penalizacion, bug: 1, ghost: 0, steel: penalizacion, fire: 1, water: 1, grass: 1, electric: 1, psychic: 1, ice: 1, dragon: 1, dark: 1, fairy: 1 },
-  fighting: { normal: ventaja, fighting: 1, flying: penalizacion, poison: penalizacion, ground: 1, rock: ventaja, bug: penalizacion, ghost: 0, steel: ventaja, fire: 1, water: 1, grass: 1, electric: 1, psychic: 1, ice: ventaja, dragon: 1, dark: penalizacion, fairy: ventaja },
-  flying: { normal: 1, fighting: ventaja, flying: 1, poison: 1, ground: 1, rock: penalizacion, bug: ventaja, ghost: 1, steel: penalizacion, fire: 1, water: 1, grass: penalizacion, electric: ventaja, psychic: 1, ice: 1, dragon: 1, dark: 1, fairy: 1 },
-  poison: { normal: 1, fighting: 1, flying: 1, poison: penalizacion, ground: penalizacion, rock: penalizacion, bug: 1, ghost: penalizacion, steel: 0, fire: 1, water: 1, grass: ventaja, electric: 1, psychic: 1, ice: 1, dragon: 1, dark: 1, fairy: penalizacion },
+  fighting: { normal: ventaja, fighting: 1, flying: penalizacion, poison: penalizacion, ground: 1, rock: ventaja, bug: penalizacion, ghost: 0, steel: ventaja, fire: 1, water: 1, grass: 1, electric: 1, psychic: penalizacion, ice: ventaja, dragon: 1, dark: ventaja, fairy: penalizacion },
+  flying: { normal: 1, fighting: ventaja, flying: 1, poison: 1, ground: 1, rock: penalizacion, bug: ventaja, ghost: 1, steel: penalizacion, fire: 1, water: 1, grass: ventaja, electric: penalizacion, psychic: 1, ice: 1, dragon: 1, dark: 1, fairy: 1 },
+  poison: { normal: 1, fighting: 1, flying: 1, poison: penalizacion, ground: penalizacion, rock: penalizacion, bug: 1, ghost: penalizacion, steel: 0, fire: 1, water: 1, grass: ventaja, electric: 1, psychic: 1, ice: 1, dragon: 1, dark: 1, fairy: ventaja },
   ground: { normal: 1, fighting: 1, flying: 0, poison: ventaja, ground: 1, rock: ventaja, bug: penalizacion, ghost: 1, steel: ventaja, fire: ventaja, water: 1, grass: penalizacion, electric: ventaja, psychic: 1, ice: 1, dragon: 1, dark: 1, fairy: 1 },
   rock: { normal: 1, fighting: penalizacion, flying: ventaja, poison: 1, ground: penalizacion, rock: 1, bug: ventaja, ghost: 1, steel: penalizacion, fire: ventaja, water: 1, grass: 1, electric: 1, psychic: 1, ice: ventaja, dragon: 1, dark: 1, fairy: 1 },
-  bug: { normal: 1, fighting: penalizacion, flying: penalizacion, poison: 1, ground: 1, rock: 1, bug: 1, ghost: penalizacion, steel: penalizacion, fire: penalizacion, water: 1, grass: ventaja, electric: 1, psychic: ventaja, ice: 1, dragon: 1, dark: ventaja, fairy: penalizacion },
-  ghost: { normal: 0, fighting: 0, flying: 1, poison: 1, ground: 1, rock: 1, bug: 1, ghost: ventaja, steel: penalizacion, fire: 1, water: 1, grass: 1, electric: 1, psychic: 1, ice: 1, dragon: 1, dark: ventaja, fairy: 1 },
+  bug: { normal: 1, fighting: penalizacion, flying: penalizacion, poison: penalizacion, ground: 1, rock: 1, bug: 1, ghost: penalizacion, steel: penalizacion, fire: penalizacion, water: 1, grass: ventaja, electric: 1, psychic: ventaja, ice: 1, dragon: 1, dark: ventaja, fairy: penalizacion },
+  ghost: { normal: 0, fighting: 1, flying: 1, poison: 1, ground: 1, rock: 1, bug: 1, ghost: ventaja, steel: 1, fire: 1, water: 1, grass: 1, electric: 1, psychic: ventaja, ice: 1, dragon: 1, dark: penalizacion, fairy: 1 },
   steel: { normal: 1, fighting: 1, flying: 1, poison: 1, ground: 1, rock: ventaja, bug: 1, ghost: 1, steel: penalizacion, fire: penalizacion, water: penalizacion, grass: 1, electric: penalizacion, psychic: 1, ice: ventaja, dragon: 1, dark: 1, fairy: ventaja },
   fire: { normal: 1, fighting: 1, flying: 1, poison: 1, ground: 1, rock: penalizacion, bug: ventaja, ghost: 1, steel: ventaja, fire: penalizacion, water: penalizacion, grass: ventaja, electric: 1, psychic: 1, ice: ventaja, dragon: penalizacion, dark: 1, fairy: 1 },
   water: { normal: 1, fighting: 1, flying: 1, poison: 1, ground: ventaja, rock: ventaja, bug: 1, ghost: 1, steel: 1, fire: ventaja, water: penalizacion, grass: penalizacion, electric: 1, psychic: 1, ice: 1, dragon: penalizacion, dark: 1, fairy: 1 },
   grass: { normal: 1, fighting: 1, flying: penalizacion, poison: penalizacion, ground: ventaja, rock: ventaja, bug: penalizacion, ghost: 1, steel: penalizacion, fire: penalizacion, water: ventaja, grass: penalizacion, electric: 1, psychic: 1, ice: 1, dragon: penalizacion, dark: 1, fairy: 1 },
   electric: { normal: 1, fighting: 1, flying: ventaja, poison: 1, ground: 0, rock: 1, bug: 1, ghost: 1, steel: 1, fire: 1, water: ventaja, grass: penalizacion, electric: penalizacion, psychic: 1, ice: 1, dragon: penalizacion, dark: 1, fairy: 1 },
   psychic: { normal: 1, fighting: ventaja, flying: 1, poison: ventaja, ground: 1, rock: 1, bug: 1, ghost: 1, steel: penalizacion, fire: 1, water: 1, grass: 1, electric: 1, psychic: penalizacion, ice: 1, dragon: 1, dark: 0, fairy: 1 },
-  ice: { normal: 1, fighting: 1, flying: 1, poison: 1, ground: 1, rock: 1, bug: 1, ghost: 1, steel: ventaja, fire: ventaja, water: penalizacion, grass: penalizacion, electric: 1, psychic: 1, ice: penalizacion, dragon: ventaja, dark: 1, fairy: 1 },
+  ice: { normal: 1, fighting: 1, flying: ventaja, poison: 1, ground: ventaja, rock: 1, bug: 1, ghost: 1, steel: penalizacion, fire: penalizacion, water: penalizacion, grass: ventaja, electric: 1, psychic: 1, ice: penalizacion, dragon: ventaja, dark: 1, fairy: 1 },
   dragon: { normal: 1, fighting: 1, flying: 1, poison: 1, ground: 1, rock: 1, bug: 1, ghost: 1, steel: penalizacion, fire: 1, water: 1, grass: 1, electric: 1, psychic: 1, ice: 1, dragon: ventaja, dark: 1, fairy: 0 },
-  dark: { normal: 1, fighting: penalizacion, flying: 1, poison: 1, ground: 1, rock: 1, bug: 1, ghost: ventaja, steel: 1, fire: 1, water: 1, grass: 1, electric: 1, psychic: 2, ice: 1, dragon: 1, dark: penalizacion, fairy: penalizacion },
-}
+  dark: { normal: 1, fighting: penalizacion, flying: 1, poison: 1, ground: 1, rock: 1, bug: 1, ghost: ventaja, steel: 1, fire: 1, water: 1, grass: 1, electric: 1, psychic: ventaja, ice: 1, dragon: 1, dark: penalizacion, fairy: penalizacion },
+  fairy: { normal: 1, fighting: ventaja, flying: 1, poison: penalizacion, ground: 1, rock: 1, bug: 1, ghost: 1, steel: penalizacion, fire: penalizacion, water: 1, grass: 1, electric: 1, psychic: 1, ice: 1, dragon: ventaja, dark: ventaja, fairy: 1 },
+};
+
+// Potencia media de un movimiento. Calibra los turnos para noquear a un rango legible (1-8).
+const POTENCIA_BASE = 35;
+
+const round4 = (n) => Number(n.toFixed(4));
+
+const getEffectiveness = (tipoAtacante, tipoDefensor) => {
+  const fila = effectiveness[tipoAtacante.toLowerCase()];
+  const valor = fila?.[tipoDefensor.toLowerCase()];
+  if (valor === undefined) {
+    console.log(`Sin efectividad definida para ${tipoAtacante} → ${tipoDefensor}`);
+    return 1;
+  }
+  return valor;
+};
+
+const effectivenessLabel = (valor) => {
+  if (valor === 0) return "inmune";
+  if (valor > 1) return "ventaja";
+  if (valor < 1) return "penalización";
+  return "neutral";
+};
+
+/* Cada Pokémon ataca por su mejor vía (física o especial) y el rival se defiende con la
+stat que le corresponde. Con el daño por turno sale cuántos turnos necesita para noquear. */
+const buildAttack = (atacante, defensor) => {
+  const atq = statValue(atacante, "attack");
+  const atqEsp = statValue(atacante, "special-attack");
+  const fisico = atq >= atqEsp;
+  const ofensiva = fisico ? atq : atqEsp;
+  const defensaRival = fisico
+    ? statValue(defensor, "defense")
+    : statValue(defensor, "special-defense");
+  const tipo = getEffectiveness(atacante.mainType, defensor.mainType);
+  const suerte = round4(0.85 + Math.random() * 0.3);
+  const hpRival = statValue(defensor, "hp");
+  const golpe = round4((ofensiva / defensaRival) * POTENCIA_BASE * tipo * suerte);
+  return {
+    fisico,
+    ofensiva,
+    defensaRival,
+    tipo,
+    suerte,
+    hpRival,
+    golpe,
+    turnos: golpe > 0 ? Math.ceil(hpRival / golpe) : Infinity,
+    velocidad: statValue(atacante, "speed"),
+  };
+};
 
 const playCombatSound = () => {
     const combatSoundUrl = ("media/battle.mp3")
@@ -297,159 +356,95 @@ async function combat() {
   const pokemon1 = original150.find((pokemon) => pokemon.name === pokemon1Name);
   const pokemon2 = original150.find((pokemon) => pokemon.name === pokemon2Name);
 
-  const hp1 = pokemon1.stats[0].base_stat;
-  const ataque1 = pokemon1.stats[1].base_stat;
-  const defensa1 = pokemon1.stats[2].base_stat;
-  const ataqueEspecial1 = pokemon1.stats[3].base_stat;
-  const defensaEspecial1 = pokemon1.stats[4].base_stat;
-  const velocidad1 = pokemon1.stats[5].base_stat;
-
-  const hp2 = pokemon2.stats[0].base_stat;
-  const ataque2 = pokemon2.stats[1].base_stat;
-  const defensa2 = pokemon2.stats[2].base_stat;
-  const ataqueEspecial2 = pokemon2.stats[3].base_stat;
-  const defensaEspecial2 = pokemon2.stats[4].base_stat;
-  const velocidad2 = pokemon2.stats[5].base_stat;
-
-  const round4 = (n) => Number(n.toFixed(4));
-
-  // Factor aleatorio 0.85–1.15 (suerte del combate), a 4 decimales.
-  const factorAleatorio1 = round4(0.85 + Math.random() * 0.3);
-  const factorAleatorio2 = round4(0.85 + Math.random() * 0.3);
-
-  // Efectividad de tipo atacante → tipo rival.
-  function getEffectiveness(objArray, pokemon1Type, pokemon2Type) {
-    const type1 = pokemon1Type.toLowerCase();
-    const type2 = pokemon2Type.toLowerCase();
-    if (objArray[type1] && objArray[type1][type2] !== undefined) {
-      return objArray[type1][type2];
-    }
-    console.log("No se encontró una efectividad definida para estos tipos de Pokémon.");
-    return 1;
-  }
-
-  const multiplicadorTipo1 = getEffectiveness(
-    effectiveness,
-    pokemon1.mainType,
-    pokemon2.mainType
-  );
-  const multiplicadorTipo2 = getEffectiveness(
-    effectiveness,
-    pokemon2.mainType,
-    pokemon1.mainType
-  );
-
-  const power1 = round4(
-    ((hp1 * (ataque1 + ataqueEspecial1)) / (defensa2 + defensaEspecial2)) *
-      (velocidad1 / 100) *
-      multiplicadorTipo1 *
-      factorAleatorio1
-  );
-  const power2 = round4(
-    ((hp2 * (ataque2 + ataqueEspecial2)) / (defensa1 + defensaEspecial1)) *
-      (velocidad2 / 100) *
-      multiplicadorTipo2 *
-      factorAleatorio2
-  );
+  const ataque1 = buildAttack(pokemon1, pokemon2);
+  const ataque2 = buildAttack(pokemon2, pokemon1);
 
   const chip = (attr, value, colorClass) =>
     `<span class="formula-chip formula-chip--${colorClass}"><span class="formula-chip__attr">${attr}</span><span class="formula-chip__val">${value}</span></span>`;
 
-  const buildEquation = (own, against, colorClass, power) => {
+  const turnosTexto = (turnos) => (turnos === Infinity ? "∞" : turnos);
+
+  const buildEquation = (attack, colorClass) => {
     const rivalClass = colorClass === "verde" ? "rojo" : "verde";
+    const via = attack.fisico ? "físico" : "especial";
+    const atqLabel = attack.fisico ? "Atq" : "Atq.Esp";
+    const defLabel = attack.fisico ? "Def.rival" : "Def.Esp.rival";
+    const nota =
+      attack.turnos === Infinity
+        ? "No puede dañarlo: tipo inmune"
+        : `Ataque ${via} · tipo ${effectivenessLabel(attack.tipo)} (×${attack.tipo}) · velocidad ${attack.velocidad}`;
     return `
     <div class="ecuacion">
-      <div class="ecuacion__label">Power</div>
-      <div class="formula" aria-label="Ecuación de poder">
+      <div class="ecuacion__label">Daño por turno</div>
+      <div class="formula" aria-label="Cálculo del daño por turno">
         <span class="formula-group">
-          <span class="formula-paren">(</span>
-          ${chip("HP", own.hp, colorClass)}
-          <span class="formula-op">×</span>
-          <span class="formula-paren">(</span>
-          ${chip("Atq", own.ataque, colorClass)}
-          <span class="formula-op">+</span>
-          ${chip("Atq.Esp", own.ataqueEspecial, colorClass)}
-          <span class="formula-paren">)</span>
-          <span class="formula-paren">)</span>
-        </span>
-        <span class="formula-op formula-op--div">÷</span>
-        <span class="formula-group">
-          <span class="formula-paren">(</span>
-          ${chip("Def.rival", against.defensa, rivalClass)}
-          <span class="formula-op">+</span>
-          ${chip("Def.Esp.rival", against.defensaEspecial, rivalClass)}
-          <span class="formula-paren">)</span>
+          ${chip(atqLabel, attack.ofensiva, colorClass)}
+          <span class="formula-op formula-op--div">÷</span>
+          ${chip(defLabel, attack.defensaRival, rivalClass)}
         </span>
         <span class="formula-op">×</span>
+        ${chip("Potencia", POTENCIA_BASE, "neutral")}
+        <span class="formula-op">×</span>
+        ${chip("Tipo", attack.tipo, colorClass)}
+        <span class="formula-op">×</span>
+        ${chip("Suerte", attack.suerte, colorClass)}
+        <span class="formula-op">=</span>
+        ${chip("Daño", attack.golpe, colorClass)}
+      </div>
+      <div class="ecuacion__label">Turnos para noquear</div>
+      <div class="formula" aria-label="Cálculo de turnos para noquear">
         <span class="formula-group">
-          <span class="formula-paren">(</span>
-          ${chip("Vel", own.velocidad, colorClass)}
-          <span class="formula-op">÷</span>
-          <span class="formula-chip formula-chip--neutral"><span class="formula-chip__val">100</span></span>
-          <span class="formula-paren">)</span>
+          ${chip("HP.rival", attack.hpRival, rivalClass)}
+          <span class="formula-op formula-op--div">÷</span>
+          ${chip("Daño", attack.golpe, colorClass)}
         </span>
-        <span class="formula-op">×</span>
-        ${chip("Tipo", own.multiplicadorTipo, colorClass)}
-        <span class="formula-op">×</span>
-        ${chip("Suerte", own.factorAleatorio, colorClass)}
       </div>
       <div class="ecuacion__result">
         <span class="ecuacion__equals">=</span>
-        <span class="power-result power-result--${colorClass}">${power}</span>
+        <span class="power-result power-result--${colorClass}">${turnosTexto(attack.turnos)}</span>
+        <span class="ecuacion__unit">${attack.turnos === 1 ? "turno" : "turnos"}</span>
       </div>
+      <p class="ecuacion__note">${nota}</p>
     </div>`;
   };
 
-  const stats1 = {
-    hp: hp1,
-    ataque: ataque1,
-    ataqueEspecial: ataqueEspecial1,
-    velocidad: velocidad1,
-    multiplicadorTipo: multiplicadorTipo1,
-    factorAleatorio: factorAleatorio1,
-  };
-  const stats2 = {
-    hp: hp2,
-    ataque: ataque2,
-    ataqueEspecial: ataqueEspecial2,
-    velocidad: velocidad2,
-    multiplicadorTipo: multiplicadorTipo2,
-    factorAleatorio: factorAleatorio2,
-  };
-  const def1 = { defensa: defensa1, defensaEspecial: defensaEspecial1 };
-  const def2 = { defensa: defensa2, defensaEspecial: defensaEspecial2 };
-
   const roleOf = (poke) => (poke.id === pokemon1.id ? "Local" : "Visitante");
 
-  if (power1 > power2) {
+  // Gana quien noquea en menos turnos; a igualdad de turnos golpea primero el más rápido.
+  let winner = null;
+  if (ataque1.turnos !== ataque2.turnos) {
+    winner = ataque1.turnos < ataque2.turnos ? pokemon1 : pokemon2;
+  } else if (ataque1.velocidad !== ataque2.velocidad) {
+    winner = ataque1.velocidad > ataque2.velocidad ? pokemon1 : pokemon2;
+  }
+
+  if (winner) {
+    const ganaLocal = winner === pokemon1;
+    const ganaPoke = ganaLocal ? pokemon1 : pokemon2;
+    const pierdePoke = ganaLocal ? pokemon2 : pokemon1;
+    const ganaAtaque = ganaLocal ? ataque1 : ataque2;
+    const pierdeAtaque = ganaLocal ? ataque2 : ataque1;
+    const mismoTurnos = ataque1.turnos === ataque2.turnos;
     result$$.innerHTML = `
       <div class="combat-result">
-        ${combatPanel(roleOf(pokemon1), pokemon1.name, "ganador", buildEquation(stats1, def2, "verde", power1))}
-        <p class="gana">gana el combate a</p>
-        ${combatPanel(roleOf(pokemon2), pokemon2.name, "perdedor", buildEquation(stats2, def1, "rojo", power2))}
+        ${combatPanel(roleOf(ganaPoke), ganaPoke.name, "ganador", buildEquation(ganaAtaque, "verde"))}
+        <p class="gana">${mismoTurnos ? "golpea primero y gana a" : "gana el combate a"}</p>
+        ${combatPanel(roleOf(pierdePoke), pierdePoke.name, "perdedor", buildEquation(pierdeAtaque, "rojo"))}
       </div>
     `;
-    drawCombatCards(pokemon1, pokemon2, pokemon1);
-    console.log(pokemon1.name, power1, "-", pokemon2.name, power2);
-  } else if (power1 < power2) {
-    result$$.innerHTML = `
-      <div class="combat-result">
-        ${combatPanel(roleOf(pokemon2), pokemon2.name, "ganador", buildEquation(stats2, def1, "verde", power2))}
-        <p class="gana">gana el combate a</p>
-        ${combatPanel(roleOf(pokemon1), pokemon1.name, "perdedor", buildEquation(stats1, def2, "rojo", power1))}
-      </div>
-    `;
-    drawCombatCards(pokemon1, pokemon2, pokemon2);
-    console.log(pokemon2.name, power2, "-", pokemon1.name, power1);
+    drawCombatCards(pokemon1, pokemon2, winner);
+    console.log(
+      `${ganaPoke.name} ${turnosTexto(ganaAtaque.turnos)} turnos - ${pierdePoke.name} ${turnosTexto(pierdeAtaque.turnos)} turnos`
+    );
   } else {
     result$$.innerHTML = `
       <div class="combat-result combat-result--empate">
-        <p class="gana">¡Empate! (${power1} = ${power2})</p>
+        <p class="gana">¡Empate a ${turnosTexto(ataque1.turnos)} turnos y misma velocidad!</p>
         ${combatNameBlock("Local", pokemon1.name, "empate")}
         ${combatNameBlock("Visitante", pokemon2.name, "empate")}
       </div>
     `;
     drawCombatCards(pokemon1, pokemon2, null);
-    console.log(`Empatan ${power1} = ${power2}`);
+    console.log(`Empatan a ${turnosTexto(ataque1.turnos)} turnos`);
   }
 }
