@@ -90,11 +90,14 @@ div#search {
     opacity: 0.78;
     box-shadow: 4px 4px 10px #00000066;
     transform: rotate(4deg);
+    transition: none;
 }
 
-.card--loser:hover {
+.card.card--loser:hover {
     transform: rotate(4deg);
-    filter: brightness(0.5) saturate(0.6);
+    filter: brightness(0.45) saturate(0.55);
+    opacity: 0.78;
+    z-index: auto;
 }
 
 @keyframes card-bounce {
@@ -287,8 +290,11 @@ img.iconType {
         transform: unset;
     }
 
-    .card--loser:hover {
+    .card.card--loser:hover {
         transform: rotate(4deg);
+        filter: brightness(0.45) saturate(0.55);
+        opacity: 0.78;
+        z-index: auto;
     }
 
     .cardInfo td {
